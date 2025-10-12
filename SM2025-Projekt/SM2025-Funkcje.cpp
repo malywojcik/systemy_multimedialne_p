@@ -286,4 +286,6 @@ YCbCr getYCbCr(int xx, int yy)
     kolor_YCbCr.Y = 0 + (0.299 * kolor.r) + (0.587 * kolor.g) + (0.114 * kolor.b);
     kolor_YCbCr.Cb = 128 - (0.168736 * kolor.r) - (0.331264 * kolor.g) + (0.5 * kolor.b);
     kolor_YCbCr.Cr = 128 + (0.5 * kolor.r) - (0.418688 * kolor.g) - (0.081312 * kolor.b);
+
+    return kolor_YCbCr;
 }
