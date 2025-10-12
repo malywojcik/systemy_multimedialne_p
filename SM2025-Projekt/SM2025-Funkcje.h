@@ -21,4 +21,12 @@ SDL_Color getPixel(int x, int y);
 void czyscEkran(Uint8 R, Uint8 G, Uint8 B);
 void ladujBMP(char const* nazwa, int x, int y);
 
+struct YCbCr {
+    float Y;
+    float Cb;
+    float Cr;
+    };
+void setYCbCr(int xx, int yy, float y, float cb, float cr);
+YCbCr getYCbCr(int xx, int yy);
+
 #endif // SM2025_FUNKCJE_H_INCLUDED

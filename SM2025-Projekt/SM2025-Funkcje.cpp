@@ -261,3 +261,29 @@ void czyscEkran(Uint8 R, Uint8 G, Uint8 B)
     SDL_UpdateWindowSurface(window);
 }
 
+void setYCbCr(int xx, int yy, float y, float cb, float cr)
+{
+    Uint8 R, G, B;
+    float r, g, b;
+    r = y + 1.402 * (cr - 128);
+    g = y - 0.344136 * (cb - 128) - 0.714136 * (cr - 128);
+    b = y + 1.772 * (cb - 128);
+    R = (r > 255) ? 255 : r ;
+    G = (g > 255) ? 255 : g;
+    B = (b > 255) ? 255 : b;
+
+    R = (r < 0) ? 0 : r;
+    G = (g < 0) ? 0 : g;
+    B = (b < 0) ? 0 : b;
+
+    setPixel(xx, yy, R, G, B);
+}
+
+YCbCr getYCbCr(int xx, int yy)
+{
+    SDL_Color kolor = getPixel(xx, yy);
+    YCbCr kolor_YCbCr;
+    kolor_YCbCr.Y = 0 + (0.299 * kolor.r) + (0.587 * kolor.g) + (0.114 * kolor.b);
+    kolor_YCbCr.Cb = 128 - (0.168736 * kolor.r) - (0.331264 * kolor.g) + (0.5 * kolor.b);
+    kolor_YCbCr.Cr = 128 + (0.5 * kolor.r) - (0.418688 * kolor.g) - (0.081312 * kolor.b);
+}
