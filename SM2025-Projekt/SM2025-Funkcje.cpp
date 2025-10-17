@@ -289,3 +289,60 @@ YCbCr getYCbCr(int xx, int yy)
 
     return kolor_YCbCr;
 }
+
+void setYUV(int xx, int yy, float y, float u, float v)
+{
+
+    float U = u - 128.0f;
+    float V = v - 128.0f;
+
+    float r = y + 1.13983f * V;
+    float g = y - 0.39465f * U - 0.58060f * V;
+    float b = y + 2.03211f * U;
+
+    // ograniczanie do [0,255]
+    if (r < 0.0f) r = 0.0f; if (r > 255.0f) r = 255.0f;
+    if (g < 0.0f) g = 0.0f; if (g > 255.0f) g = 255.0f;
+    if (b < 0.0f) b = 0.0f; if (b > 255.0f) b = 255.0f;
+
+    setPixel(xx, yy, (Uint8)r, (Uint8)g, (Uint8)b);
+}
+YUV getYUV(int xx, int yy)
+{
+    SDL_Color kolor = getPixel(xx, yy);
+    YUV out;
+    out.Y = 0.299f * kolor.r + 0.587f * kolor.g + 0.114f * kolor.b;
+
+    out.U = 128.0f + (-0.14713f * kolor.r) + (-0.28886f * kolor.g) + (0.436f * kolor.b);
+    out.V = 128.0f + (0.615f * kolor.r) + (-0.51499f * kolor.g) + (-0.10001f * kolor.b);
+    return out;
+}
+
+void setYIQ(int xx, int yy, float y, float i, float q)
+{
+
+    float I = i - 128.0f;
+    float Q = q - 128.0f;
+
+    float r = y + 0.956f * I + 0.619f * Q;
+    float g = y - 0.272f * I - 0.647f * Q;
+    float b = y - 1.106f * I + 1.703f * Q;
+
+    // ograniczanie do [0,255]
+    if (r < 0.0f) r = 0.0f; if (r > 255.0f) r = 255.0f;
+    if (g < 0.0f) g = 0.0f; if (g > 255.0f) g = 255.0f;
+    if (b < 0.0f) b = 0.0f; if (b > 255.0f) b = 255.0f;
+
+    setPixel(xx, yy, (Uint8)r, (Uint8)g, (Uint8)b);
+}
+
+YIQ getYIQ(int xx, int yy)
+{
+    SDL_Color kolor = getPixel(xx, yy);
+    YIQ out;
+    out.Y = 0.299f * kolor.r + 0.587f * kolor.g + 0.114f * kolor.b;
+
+    out.I = 128.0f + (0.5959f * kolor.r) + (-0.2746f * kolor.g) + (-0.3213f * kolor.b);
+    out.Q = 128.0f + (0.2115f * kolor.r) + (-0.5227f * kolor.g) + (0.3112f * kolor.b);
+    return out;
+}

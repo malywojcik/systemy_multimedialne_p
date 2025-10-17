@@ -26,7 +26,23 @@ struct YCbCr {
     float Cb;
     float Cr;
     };
+
+    struct YUV {
+    float Y;
+    float U;
+    float V;
+};
+struct YIQ {
+    float Y;
+    float I;
+    float Q;
+};
+
 void setYCbCr(int xx, int yy, float y, float cb, float cr);
 YCbCr getYCbCr(int xx, int yy);
+void setYUV(int xx, int yy, float y, float u, float v);
+YUV getYUV(int xx, int yy);
+void setYIQ(int xx, int yy, float y, float i, float q);
+YIQ getYIQ(int xx, int yy);
 
 #endif // SM2025_FUNKCJE_H_INCLUDED
