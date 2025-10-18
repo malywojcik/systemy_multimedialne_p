@@ -8,7 +8,13 @@
 
 void Funkcja1() {
 
-    //...
+    //... YCbCr
+    for(int x=0; x<szerokosc/2; x++)
+        for(int y=0; y<wysokosc/2; y++)
+        {
+            YCbCr YCbCr = getYCbCr(x, y);
+            setYCbCr(x + szerokosc/2, y, YCbCr.Y, YCbCr.Cb, YCbCr.Cr);
+        }
 
     SDL_UpdateWindowSurface(window);
 }
