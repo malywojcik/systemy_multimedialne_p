@@ -9,5 +9,4 @@ int ileKolorow = 0;
 
 SDL_Color paleta8k[256];
 SDL_Color paleta8s[256];
-
 SDL_Color yCbCr[256];

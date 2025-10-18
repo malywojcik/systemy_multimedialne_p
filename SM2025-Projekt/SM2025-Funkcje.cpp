@@ -4,11 +4,93 @@
 #include "SM2025-Paleta.h"
 #include "SM2025-MedianCut.h"
 #include "SM2025-Pliki.h"
+#include  <algorithm>
+
+SDL_Color HSLtoRGB(HSL hsl) {
+    float H = hsl.H;
+    float S = hsl.S;
+    float L = hsl.L;
+
+    float C = (1 - std::fabs(2 * L - 1)) * S;
+    float X = C * (1 - std::fabs(fmod(H / 60.0f, 2) - 1));
+    float m = L - C / 2.0f;
+
+    float r = 0, g = 0, b = 0;
+
+    if (H < 60) { r = C; g = X; b = 0; }
+    else if (H < 120) { r = X; g = C; b = 0; }
+    else if (H < 180) { r = 0; g = C; b = X; }
+    else if (H < 240) { r = 0; g = X; b = C; }
+    else if (H < 300) { r = X; g = 0; b = C; }
+    else { r = C; g = 0; b = X; }
+
+    SDL_Color rgb;
+    rgb.r = (uint8_t)((r + m) * 255);
+    rgb.g = (uint8_t)((g + m) * 255);
+    rgb.b = (uint8_t)((b + m) * 255);
+    return rgb;
+}
+
+HSL RGBtoHSL(SDL_Color rgb) {
+    float r = rgb.r / 255.0f;
+    float g = rgb.g / 255.0f;
+    float b = rgb.b / 255.0f;
+
+    float maxVal = std::max({r, g, b});
+    float minVal = std::min({r, g, b});
+    float delta = maxVal - minVal;
+
+    HSL hsl;
+    hsl.L = (maxVal + minVal) / 2.0f;
+
+    if (delta == 0) {
+        hsl.H = 0;
+        hsl.S = 0;
+    } else {
+        hsl.S = delta / (1 - std::fabs(2 * hsl.L - 1));
+
+        if (maxVal == r)
+            hsl.H = 60 * fmod(((g - b) / delta), 6);
+        else if (maxVal == g)
+            hsl.H = 60 * (((b - r) / delta) + 2);
+        else
+            hsl.H = 60 * (((r - g) / delta) + 4);
+
+        if (hsl.H < 0)
+            hsl.H += 360;
+    }
+
+    return hsl;
+}
+
+void setHSL(int xx, int yy, float h, float s, float l) {
+    HSL hsl{h, s, l};
+
+     SDL_Color rgb = HSLtoRGB(hsl);
+
+     //std::cout<<"X:"<<xx<<" y:"<<yy<<"R:"<<(int)rgb.r<<" G:"<<(int)rgb.g <<"B:"<<(int)rgb.b<<endl;
+    setPixel(xx, yy, rgb.r, rgb.g, rgb.b);
+}
+
+HSL getHSL(int xx, int yy) {
+    SDL_Color kolor = getPixel(xx, yy);
+    HSL hsl = RGBtoHSL(kolor);
+
+    return hsl;
+}
 
 
 void Funkcja1() {
+    std::cout<<"start"<<endl;
+    for(int x= 0; x<szerokosc/2; x++)
+    for(int y= 0; y<wysokosc/2; y++){
+            HSL kolor_hsl=getHSL(x,y);
+            setHSL(x+szerokosc/2,y,kolor_hsl.H,kolor_hsl.S,kolor_hsl.L);
 
-    //...
+
+    }
+
+    std::cout<<"Koniec"<<endl;
 
     SDL_UpdateWindowSurface(window);
 }
