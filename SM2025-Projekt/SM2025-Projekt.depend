@@ -3822,7 +3822,7 @@
 1760781240 c:\sm\systemy_multimedialne_p\sm2025-projekt\sm2025-zmienne.h
 	<SDL2/SDL.h>
 
-1760784360 c:\sm\systemy_multimedialne_p\sm2025-projekt\sm2025-funkcje.h
+1760785809 c:\sm\systemy_multimedialne_p\sm2025-projekt\sm2025-funkcje.h
 	<stdio.h>
 	<math.h>
 	<SDL2/SDL.h>
@@ -3868,7 +3868,7 @@
 1760781240 source:c:\sm\systemy_multimedialne_p\sm2025-projekt\sm2025-zmienne.cpp
 	"SM2025-Zmienne.h"
 
-1760783617 source:c:\sm\systemy_multimedialne_p\sm2025-projekt\sm2025-funkcje.cpp
+1760786051 source:c:\sm\systemy_multimedialne_p\sm2025-projekt\sm2025-funkcje.cpp
 	"SM2025-Funkcje.h"
 	"SM2025-Zmienne.h"
 	"SM2025-Paleta.h"

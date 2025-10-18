@@ -47,5 +47,15 @@ YUV getYUV(int xx, int yy);
 void setYIQ(int xx, int yy, float y, float i, float q);
 YIQ getYIQ(int xx, int yy);
 
+struct RGB565 {
+    Uint8 r; // 0-31
+    Uint8 g; // 0-63
+    Uint8 b; // 0-31
+};
+
+void setRGB565(int xx, int yy, Uint8 r, Uint8 g, Uint8 b);
+void setRGB565(int xx, int yy, Uint16 rgb565);
+SDL_Color getRGB565(int xx, int yy);
+Uint16 getRGB565_(int xx, int yy);
 
 #endif // SM2025_FUNKCJE_H_INCLUDED
