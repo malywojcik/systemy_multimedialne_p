@@ -8,11 +8,10 @@
 
 void Funkcja1() {
 
-    //...
+
 
     SDL_UpdateWindowSurface(window);
 }
-
 void Funkcja2() {
 
     //...
@@ -22,28 +21,82 @@ void Funkcja2() {
 
 void Funkcja3() {
 
-    //...
+
+//YUV - TEST 1
+
+
+//    for (int y = 0; y < wysokosc; ++y) {
+//        for (int x = 0; x < szerokosc / 2; ++x) {
+//            YUV yuv = getYUV(x, y);
+
+//            setYUV(x + szerokosc / 2, y, yuv.Y, 128.0f, 128.0f);
+//        }
+//    }
+
+// YIQ - TEST 1
+  for (int y = 0; y < wysokosc; ++y) {
+        for (int x = 0; x < szerokosc / 2; ++x) {
+            YIQ yiq = getYIQ(x, y);
+
+            setYIQ(x + szerokosc / 2, y, yiq.Y, 128.0f, 128.0f);
+        }
+    }
 
     SDL_UpdateWindowSurface(window);
 }
 
 void Funkcja4() {
 
-    //...
+    //TEST2 - YUV
+//    for (int y = 0; y < wysokosc; ++y) {
+//        for (int x = 0; x < szerokosc / 2; ++x) {
+//            YUV yuv = getYUV(x, y);
 
+//            setYUV(x + szerokosc / 2, y, 128.0f, yuv.U, 128.0f);
+//        }
+//    }
+
+//TEST2 - YIQ
+for (int y = 0; y < wysokosc; ++y) {
+        for (int x = 0; x < szerokosc / 2; ++x) {
+            YIQ yiq = getYIQ(x, y);
+
+            setYIQ(x + szerokosc /2, y, 128.0f, yiq.I, 128.0f);
+        }
+    }
     SDL_UpdateWindowSurface(window);
 }
 
 void Funkcja5() {
 
-    //...
+  //TEST 3 - YUV
+
+
+//    for (int y = 0; y < szerokosc / 2; ++y) {
+//        for (int x = 0; x < half; ++x) {
+//            YUV yuv = getYUV(x, y);
+
+//        setYUV(x + szerokosc / 2, y, 128.0f, 128.0f, yuv.V);
+//        }
+//    }
+
+//TEST 3 - YIQ
+ for (int y = 0; y < wysokosc; ++y) {
+        for (int x = 0; x < szerokosc / 2; ++x) {
+            YIQ yiq = getYIQ(x, y);
+
+            setYIQ(x + szerokosc / 2, y, 128.0f, 128.0f, yiq.Q);
+        }
+    }
+
+
 
     SDL_UpdateWindowSurface(window);
 }
 
 void Funkcja6() {
 
-    //...
+
 
     SDL_UpdateWindowSurface(window);
 }
@@ -346,3 +399,5 @@ YIQ getYIQ(int xx, int yy)
     out.Q = 128.0f + (0.2115f * kolor.r) + (-0.5227f * kolor.g) + (0.3112f * kolor.b);
     return out;
 }
+
+

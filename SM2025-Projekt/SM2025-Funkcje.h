@@ -17,7 +17,9 @@ void Funkcja8();
 void Funkcja9();
 
 void setPixel(int x, int y, Uint8 R, Uint8 G, Uint8 B);
+void setPixelSurface(int x, int y, Uint8 R, Uint8 G, Uint8 B);
 SDL_Color getPixel(int x, int y);
+SDL_Color getPixelSurface(int x, int y, SDL_Surface *surface);
 void czyscEkran(Uint8 R, Uint8 G, Uint8 B);
 void ladujBMP(char const* nazwa, int x, int y);
 
@@ -44,5 +46,6 @@ void setYUV(int xx, int yy, float y, float u, float v);
 YUV getYUV(int xx, int yy);
 void setYIQ(int xx, int yy, float y, float i, float q);
 YIQ getYIQ(int xx, int yy);
+
 
 #endif // SM2025_FUNKCJE_H_INCLUDED
