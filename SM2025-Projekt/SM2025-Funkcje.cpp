@@ -379,3 +379,23 @@ YCbCr getYCbCr(int xx, int yy)
 
     return kolor_YCbCr;
 }
+
+void setRGB555(int xx, int yy, Uint8 r, Uint8 g, Uint8 b)
+{
+    //asd
+}
+
+void setRGB555(int xx, int yy, Uint16 rgb555)
+{
+    //asd
+}
+
+SDL_Color getRGB555(int xx, int yy)
+{
+    //asd
+}
+
+Uint16 getRGB555_(int xx, int yy)
+{
+    //asd
+}
