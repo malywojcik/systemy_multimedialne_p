@@ -308,10 +308,17 @@ void setRGB555(int xx, int yy, Uint16 rgb555)
 
 SDL_Color getRGB555(int xx, int yy)
 {
-    //asd
+    SDL_Color kolor, RGB555;
+    kolor = getPixel(xx, yy);
+    //kod
+
+    return RGB555;
 }
 
 Uint16 getRGB555_(int xx, int yy)
 {
-    //asd
+    Uint16 555;
+    // jakos te rgb razem spiac do postaci 0RRRRRGGGGGBBBBB
+
+    return RGB555;
 }
