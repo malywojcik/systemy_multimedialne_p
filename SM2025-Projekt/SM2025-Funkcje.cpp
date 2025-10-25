@@ -92,8 +92,6 @@ void Funkcja1()
 			setHSL(x+szerokosc/2,y,kolor_hsl.H,kolor_hsl.S,kolor_hsl.L);
 		}
 
-    std::cout<<"Koniec"<<endl;
-
     SDL_UpdateWindowSurface(window);
 }
 
