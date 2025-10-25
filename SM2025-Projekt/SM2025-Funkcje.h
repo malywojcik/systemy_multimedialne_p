@@ -28,12 +28,10 @@ struct YCbCr
     float Y;
     float Cb;
     float Cr;
-<<<<<<< HEAD
-};
-=======
-    };
 
-    struct YUV {
+};
+
+struct YUV {
     float Y;
     float U;
     float V;
@@ -44,7 +42,6 @@ struct YIQ {
     float Q;
 };
 
->>>>>>> origin/Dominik
 void setYCbCr(int xx, int yy, float y, float cb, float cr);
 YCbCr getYCbCr(int xx, int yy);
 void setYUV(int xx, int yy, float y, float u, float v);

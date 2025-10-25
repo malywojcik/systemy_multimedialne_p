@@ -6,7 +6,8 @@
 #include "SM2025-Pliki.h"
 #include  <algorithm>
 
-SDL_Color HSLtoRGB(HSL hsl) {
+SDL_Color HSLtoRGB(HSL hsl)
+{
     float H = hsl.H;
     float S = hsl.S;
     float L = hsl.L;
@@ -31,7 +32,8 @@ SDL_Color HSLtoRGB(HSL hsl) {
     return rgb;
 }
 
-HSL RGBtoHSL(SDL_Color rgb) {
+HSL RGBtoHSL(SDL_Color rgb)
+{
     float r = rgb.r / 255.0f;
     float g = rgb.g / 255.0f;
     float b = rgb.b / 255.0f;
@@ -79,12 +81,10 @@ HSL getHSL(int xx, int yy) {
     return hsl;
 }
 
-
-<<<<<<< HEAD
 void Funkcja1()
 {
 	//hsl
-	
+
     std::cout<<"start"<<endl;
     for(int x= 0; x<szerokosc/2; x++)
 		for(int y= 0; y<wysokosc/2; y++)
@@ -92,10 +92,23 @@ void Funkcja1()
 			HSL kolor_hsl=getHSL(x,y);
 			setHSL(x+szerokosc/2,y,kolor_hsl.H,kolor_hsl.S,kolor_hsl.L);
 		}
-=======
-void Funkcja1() {
+}
+void Funkcja2()
+{
+    //... YCbCr
 
->>>>>>> origin/Dominik
+    for(int x=0; x<szerokosc/2; x++)
+        for(int y=0; y<wysokosc/2; y++)
+        {
+            YCbCr YCbCr = getYCbCr(x, y);
+            setYCbCr(x + szerokosc/2, y, YCbCr.Y, YCbCr.Cb, YCbCr.Cr);
+        }
+
+    SDL_UpdateWindowSurface(window);
+}
+
+void Funkcja3()
+{
 
 int half = szerokosc / 2;
 
@@ -141,56 +154,6 @@ int half = szerokosc / 2;
     printf("  Sredni blad B: %.3f\n", (float)sumDiffB / pixels);
     printf("  Liczba pikseli: %d\n\n", pixels);
     SDL_UpdateWindowSurface(window);
-}
-void Funkcja2() {
-
-<<<<<<< HEAD
-    //... YCbCr
-    for(int x=0; x<szerokosc/2; x++)
-        for(int y=0; y<wysokosc/2; y++)
-        {
-            YCbCr YCbCr = getYCbCr(x, y);
-            setYCbCr(x + szerokosc/2, y, YCbCr.Y, YCbCr.Cb, YCbCr.Cr);
-        }
-=======
-   int half = szerokosc / 2;
-
-    // Wypisujemy przykładowe wartości dla pierwszych 10 pikseli
-    printf("Przykladowe wartosci (pierwszych 10 pikseli):\n");
-    printf("%-8s | Original RGB    | RGB565 (hex) | RGB565 (dec) | Unpacked R,G,B\n", "Piksel");
-    printf("---------|-----------------|--------------|--------------|----------------\n");
-
-    for (int y = 0; y < wysokosc; ++y) {
-        for (int x = 0; x < half; ++x) {
-            // Oryginalny piksel
-            SDL_Color original = getPixel(x, y);
-
-            // Pobieramy jako Uint16 (surowa wartość RGB565)
-            Uint16 rgb565 = getRGB565_(x, y);
-
-            // Rysujemy po prawej używając setRGB565(Uint16)
-            setRGB565(x + half, y, rgb565);
-
-            // Wypisujemy tylko pierwszych 10 pikseli (dla czytelności)
-            if (y == 0 && x < 10) {
-                // Rozpakowujemy dla weryfikacji
-                Uint8 r5 = (rgb565 >> 11) & 0x1F;
-                Uint8 g6 = (rgb565 >> 5)  & 0x3F;
-                Uint8 b5 =  rgb565        & 0x1F;
-
-                printf("(%3d,%3d) | %3d,%3d,%3d     | 0x%04X       | %5d        | %2d,%2d,%2d\n",
-                       x, y, original.r, original.g, original.b,
-                       rgb565, rgb565, r5, g6, b5);
-            }
-        }
-    }
->>>>>>> origin/Dominik
-
-    SDL_UpdateWindowSurface(window);
-}
-
-void Funkcja3() {
-
 
 //YUV - TEST 1
 
@@ -213,6 +176,7 @@ void Funkcja3() {
     }
 
     SDL_UpdateWindowSurface(window);
+
 }
 
 void Funkcja4() {
@@ -264,12 +228,39 @@ void Funkcja5() {
     SDL_UpdateWindowSurface(window);
 }
 
-void Funkcja6() {
+void Funkcja6()
+{
+    int half = szerokosc / 2;
 
+    // Wypisujemy przykładowe wartości dla pierwszych 10 pikseli
+    printf("Przykladowe wartosci (pierwszych 10 pikseli):\n");
+    printf("%-8s | Original RGB    | RGB565 (hex) | RGB565 (dec) | Unpacked R,G,B\n", "Piksel");
+    printf("---------|-----------------|--------------|--------------|----------------\n");
 
+    for (int y = 0; y < wysokosc; ++y) {
+        for (int x = 0; x < half; ++x) {
+            // Oryginalny piksel
+            SDL_Color original = getPixel(x, y);
 
+            // Pobieramy jako Uint16 (surowa wartość RGB565)
+            Uint16 rgb565 = getRGB565_(x, y);
 
+            // Rysujemy po prawej używając setRGB565(Uint16)
+            setRGB565(x + half, y, rgb565);
 
+            // Wypisujemy tylko pierwszych 10 pikseli (dla czytelności)
+            if (y == 0 && x < 10) {
+                // Rozpakowujemy dla weryfikacji
+                Uint8 r5 = (rgb565 >> 11) & 0x1F;
+                Uint8 g6 = (rgb565 >> 5)  & 0x3F;
+                Uint8 b5 =  rgb565        & 0x1F;
+
+                printf("(%3d,%3d) | %3d,%3d,%3d     | 0x%04X       | %5d        | %2d,%2d,%2d\n",
+                       x, y, original.r, original.g, original.b,
+                       rgb565, rgb565, r5, g6, b5);
+            }
+        }
+    }
 
     SDL_UpdateWindowSurface(window);
 }
