@@ -4,12 +4,158 @@
 #include "SM2025-Paleta.h"
 #include "SM2025-MedianCut.h"
 #include "SM2025-Pliki.h"
+#include <cmath>
+#include <algorithm>
+//funkcje pomocincze
+bool test6zmienna(float tempZ){
+    if(6*tempZ > 1)
+        return false;
+    else
+        return true;
+}
+bool test2zmienna(float tempZ){
+    if(2*tempZ > 1)
+        return false;
+    else
+        return true;
+}
+bool test3zmienna(float tempZ){
+    if(3*tempZ > 2)
+        return false;
+    else
+        return true;
+}
+float obliczanieKoloru(float tempZ, float temp0, float temp1){
+    if(test6zmienna(tempZ))
+        return temp1 + (temp0 - temp1) * 6 * tempZ;
+    else if(test2zmienna(tempZ))
+        return temp0;
+    else if(test3zmienna(tempZ))
+        return temp1 + (temp0 - temp1) * (0.666 - tempZ) * 6;
+    else
+        return temp1;
+}
+//funkcje głowne
+void setHSL(int x, int y, float h, float s, float l){
+    //std::cout << x << " "<< y << " " << h << " " << s << " " << l<<endl;
+    //zmienne finalne
+    uint8_t R;
+    uint8_t G;
+    uint8_t B;
+    //zmienne na potrzeby obliczneń
+    float temp0, temp1;
+    float barwa;
+    float zmiennaR, zmiennaG, zmiennaB;
+    //przypadek gdy h i s są równe 0
+    if(h == 0 && s == 0)
+    {   uint8_t temp = round(l *255);
+        setPixel(x,y,temp,temp,temp);
+        return;
+    }
+    //określanie wzorów do zmiennych i obliczanie zmiennnych tymczasowych
+    if(l<0.5){
+        //gdy l mniejsze 0.5
+        temp0 = l * (1.0 + s);
+    }
+    else{
+        //gdy l wieksze/równe  0.5
+        temp0 = l + s - l * s;
+    }
 
+    temp1 = 2 * l - temp0;
+    // cout<<"temp0:"<<temp0<<" temp1:"<<temp1<<endl;
+    barwa = h/360.0;
+    //cout <<"barwa: "<< barwa<<endl;
+    //obliczanie zmiennychR/G/B
+    zmiennaR = barwa + 0.333;
+    zmiennaG = barwa;
+    zmiennaB = barwa - 0.333;
+    //walidacja obliczonych danych
+    if(zmiennaR>1)
+        zmiennaR -= 1;
+    else if(zmiennaR <0)
+        zmiennaR += 1;
+    if(zmiennaG>1)
+        zmiennaG -= 1;
+    else if(zmiennaG <0)
+        zmiennaG += 1;
+    if(zmiennaB>1)
+        zmiennaB -= 1;
+    else if(zmiennaB <0)
+        zmiennaB += 1;
+   // cout << "zmiennaR:"<<zmiennaR<<" zmiennaG:"<< zmiennaG <<"zmiennaB: "<<zmiennaB<<endl;
+    // obliczanie składowych modelu RGB
+    zmiennaR = obliczanieKoloru(zmiennaR,temp0,temp1);
+    zmiennaG = obliczanieKoloru(zmiennaG,temp0,temp1);
+    zmiennaB = obliczanieKoloru(zmiennaB,temp0,temp1);
 
+   // cout <<"Poobliczeniu ->"<< "zmiennaR:"<<zmiennaR<<" zmiennaG:"<< zmiennaG <<"zmiennaB: "<<zmiennaB<<endl;
+
+    // konwersja na zakres 0 -255
+    R = round(zmiennaR * 255);
+    G = round(zmiennaG * 255);
+    B = round(zmiennaB * 255);
+    //cout << "R: "<<(int)R<< "G: "<<(int)G<<"B:"<<(int)B<<endl;
+    //ustawienie pixela
+    setPixel(x,y,R,G,B);
+}
+HSL getHSL(int x, int y){
+    //zmienne koncowe
+    float H, S, L;
+    HSL HSL;
+    //zmienne pomocinicze
+    SDL_Color RGB = getPixel(x,y);
+    int r = RGB.r;
+    int g = RGB.g;
+    int b = RGB.b;
+    //std::cout <<"r:"<<r<<" g:" << g << " b:" << b <<endl;
+    //rzutowanie na float oraz konwersja na zakres 0-1
+    float R = r/255.0f;
+    float G = g/255.0f;
+    float B = b/255.0f;
+   //std::cout <<"r:"<<R<<" g:" << G << " b:" << B <<endl;
+    float maxV = 0;
+    float minV = 1117;
+    maxV = max(max(R,G),B);
+    minV = min(min(R,G),B);
+    //cout<<"Max: " << maxV << " min: "<<minV<<endl;
+    L = (minV+maxV)/2.0f;
+    H=0;
+    S=0;
+    //okreslanie s
+    if(minV!=maxV)
+    {
+    if(L<=0.5)
+        S=(maxV-minV)/(maxV+minV);
+    else
+        S=(maxV-minV)/(2.0-maxV-minV);
+    //określanie H
+    if(R==maxV)
+        H = (G-B)/(maxV-minV);
+    else if(G==maxV)
+        H = 2.0 + (B-R)/(maxV-minV);
+    else
+        H = 4.0 + (R-G)/(maxV-minV);
+    H *= 60;
+    }
+    //walidacja H
+    if(H<0)
+        H +=360;
+
+    HSL.H=H;
+    HSL.S=S;
+    HSL.L=L;
+    //std::cout <<"h:"<<H<<" s:" << S << " l:" << L <<endl;
+    return HSL;
+}
 void Funkcja1() {
 
-    //...
-
+    for(int x =0 ; x<szerokosc/2; x++)
+        for(int y=0 ; y<wysokosc/2; y++)
+        {
+        HSL hsl = getHSL(x,y);
+        setHSL(x+szerokosc/2,y,hsl.H,hsl.S,hsl.L);
+        }
     SDL_UpdateWindowSurface(window);
 }
 

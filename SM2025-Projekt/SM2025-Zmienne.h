@@ -17,5 +17,11 @@ extern int ileKolorow;
 
 extern SDL_Color paleta8k[256];
 extern SDL_Color paleta8s[256];
+//HSL
+struct HSL{
+    float H;
+    float S;
+    float L;
+};
 
 #endif // SM2025_ZMIENNE_H_INCLUDED

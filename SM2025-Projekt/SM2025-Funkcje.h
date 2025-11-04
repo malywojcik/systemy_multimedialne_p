@@ -1,11 +1,16 @@
 // podstawowe funkcje
 #ifndef SM2025_FUNKCJE_H_INCLUDED
 #define SM2025_FUNKCJE_H_INCLUDED
-
+#include "SM2025-Zmienne.h"
 #include <stdio.h>
 #include <math.h>
 #include <SDL2/SDL.h>
-
+void setHSL(int x, int y, float h, float s, float l);
+bool test6zmienna(float tempZ);
+bool test2zmienna(float tempZ);
+bool test3zmienna(float tempZ);
+HSL getHSL(int x, int y);
+float obliczanieKoloru(float tempZ, float temp0, float temp1);
 void Funkcja1();
 void Funkcja2();
 void Funkcja3();
