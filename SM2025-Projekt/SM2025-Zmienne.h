@@ -18,5 +18,4 @@ extern int ileKolorow;
 extern SDL_Color paleta8k[256];
 extern SDL_Color paleta8s[256];
 
-    int R;
 #endif // SM2025_ZMIENNE_H_INCLUDED
