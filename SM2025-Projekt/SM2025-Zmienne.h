@@ -1,7 +1,7 @@
 // zmienne globalne
 #ifndef SM2025_ZMIENNE_H_INCLUDED
 #define SM2025_ZMIENNE_H_INCLUDED
-#include <cstdint>
+
 #include <SDL2/SDL.h>
 
 #define szerokosc 640
@@ -18,17 +18,5 @@ extern int ileKolorow;
 extern SDL_Color paleta8k[256];
 extern SDL_Color paleta8s[256];
 
-struct HSL
-{
-    float H;
-    float S;
-    float L;
-};
-
-struct RGB
-{
     int R;
-    int G;
-    int B;
-};
 #endif // SM2025_ZMIENNE_H_INCLUDED
