@@ -1,0 +1,11 @@
+/SM2025-Projekt/cmake-build-debug/
+/SM2025-Projekt/.idea/
+*.exe
+*.obj
+*.o
+*.a
+*.lib
+*.dll
+*.log
+*.tlog
+*.lastbuildstate
