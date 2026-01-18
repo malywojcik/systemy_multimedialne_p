@@ -21,4 +21,51 @@ SDL_Color getPixel(int x, int y);
 void czyscEkran(Uint8 R, Uint8 G, Uint8 B);
 void ladujBMP(char const* nazwa, int x, int y);
 
+struct YUV
+{
+    float Y;
+    float U;
+    float V;
+};
+
+struct YIQ
+{
+    float Y;
+    float I;
+    float Q;
+};
+
+struct YCbCr
+{
+    float Y;
+    float Cb;
+    float Cr;
+};
+
+struct HSL
+{
+    float H;
+    float S;
+    float L;
+};
+
+struct RGB
+{
+    Uint8 R;
+    Uint8 G;
+    Uint8 B;
+};
+
+void setYUV(int xx, int yy, float y, float u, float v);
+YUV getYUV(int xx, int yy);
+
+void setYIQ(int xx, int yy, float y, float i, float q);
+YIQ getYIQ(int xx, int yy);
+
+void setYCbCr(int xx, int yy, float y, float cb, float cr);
+YCbCr getYCbCr(int xx, int yy);
+
+void setHSL(int xx, int yy, float h, float s, float l);
+HSL getHSL(int xx, int yy);
+
 #endif // SM2025_FUNKCJE_H_INCLUDED
