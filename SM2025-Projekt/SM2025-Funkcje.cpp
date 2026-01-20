@@ -5,102 +5,51 @@
 #include "SM2025-MedianCut.h"
 #include "SM2025-Pliki.h"
 
-
 void Funkcja1()
 {
-    //test YCbCr
-    for (int i=0; i<szerokosc/2; i++)
-        for (int j=0; j<wysokosc/2; j++)
-        {
-            YCbCr ycbcr = getYCbCr(i, j);
-            setYCbCr(i+szerokosc/2, j, ycbcr.Y, ycbcr.Cb, ycbcr.Cr);
-        }
+    //...
 
     SDL_UpdateWindowSurface(window);
 }
 
 void Funkcja2()
 {
-    //test hsl
-    for (int i=0; i<szerokosc/2; i++)
-        for (int j=0; j<wysokosc/2; j++)
-        {
-            HSL hsl = getHSL(i, j);
-            setHSL(i, j+wysokosc/2, hsl.H, hsl.S, hsl.L);
-        }
+    //...
 
     SDL_UpdateWindowSurface(window);
 }
 
 void Funkcja3()
 {
-    //test yuv i yiq
-    for (int i=0; i<szerokosc/2; i++)
-        for (int j=0; j<wysokosc/2; j++)
-        {
-            YUV yuv = getYUV(i, j);
-            YIQ yiq = getYIQ(i, j);
-            setYUV(i+szerokosc/2, j, yuv.Y, yuv.U, yuv.V);
-            setYIQ(i+szerokosc/2, j+wysokosc/2, yiq.Y, yiq.I, yiq.Q);
-        }
+    //...
 
     SDL_UpdateWindowSurface(window);
 }
 
 void Funkcja4()
 {
-    //test rgb555
-    for (int i=0; i<szerokosc/2; i++)
-        for (int j=0; j<wysokosc/2; j++)
-        {
-            SDL_Color rgb555 = getRGB555(i, j);
-            Uint16 rgb555_ = getRGB555_(i, j);
-            setRGB555(i+szerokosc/2, j, rgb555.r, rgb555.g, rgb555.b);
-            setRGB555(i+szerokosc/2, j+wysokosc/2, rgb555_);
-        }
+    //...
 
     SDL_UpdateWindowSurface(window);
 }
 
 void Funkcja5()
 {
-    //test rgb565
-    for (int i=0; i<szerokosc/2; i++)
-        for (int j=0; j<wysokosc/2; j++)
-        {
-            SDL_Color rgb565 = getRGB565(i, j);
-            Uint16 rgb565_ = getRGB565_(i, j);
-            setRGB565(i+szerokosc/2, j, rgb565.r, rgb565.g, rgb565.b);
-            setRGB565(i+szerokosc/2, j+wysokosc/2, rgb565_);
-        }
+    //...
 
     SDL_UpdateWindowSurface(window);
 }
 
 void Funkcja6()
 {
-    //podprobkowanie yuv, yiq, ycbcr
-    for (int i=0; i<szerokosc; i+=2)
-        for (int j=0; j<wysokosc; j+=2)
-        {
-            podprobkowanieYUV(i, j, i+szerokosc/2, j);
-            podprobkowanieYIQ(i, j, i, j+wysokosc/2);
-            podprobkowanieYCbCr(i, j, i+szerokosc/2, j+wysokosc/2);
-        }
+    //...
 
     SDL_UpdateWindowSurface(window);
 }
 
 void Funkcja7()
 {
-    //podprobkowanie hsl
-    for (int i=0; i<szerokosc; i+=2)
-        for (int j=0; j<wysokosc; j+=2)
-        {
-            podprobkowanieH(i, j, i+szerokosc/2, j);
-            podprobkowanieS(i, j, i, j+wysokosc/2);
-            podprobkowanieL(i, j, i+szerokosc/2, j+wysokosc/2);
-        }
+    //...
 
     SDL_UpdateWindowSurface(window);
 }
@@ -709,3 +658,71 @@ void podprobkowanieL(int xx, int yy, int x, int y)
     setHSL(x, y+1, p3.H, p3.S, avgL);
     setHSL(x+1, y+1, p4.H, p4.S, avgL);
 }
+
+/*
+    //testy
+
+    //test YCbCr
+    for (int i=0; i<szerokosc/2; i++)
+        for (int j=0; j<wysokosc/2; j++)
+        {
+            YCbCr ycbcr = getYCbCr(i, j);
+            setYCbCr(i+szerokosc/2, j, ycbcr.Y, ycbcr.Cb, ycbcr.Cr);
+        }
+
+    //test hsl
+    for (int i=0; i<szerokosc/2; i++)
+        for (int j=0; j<wysokosc/2; j++)
+        {
+            HSL hsl = getHSL(i, j);
+            setHSL(i, j+wysokosc/2, hsl.H, hsl.S, hsl.L);
+        }
+
+    //test yuv i yiq
+    for (int i=0; i<szerokosc/2; i++)
+        for (int j=0; j<wysokosc/2; j++)
+        {
+            YUV yuv = getYUV(i, j);
+            YIQ yiq = getYIQ(i, j);
+            setYUV(i+szerokosc/2, j, yuv.Y, yuv.U, yuv.V);
+            setYIQ(i+szerokosc/2, j+wysokosc/2, yiq.Y, yiq.I, yiq.Q);
+        }
+
+    //test rgb555
+    for (int i=0; i<szerokosc/2; i++)
+        for (int j=0; j<wysokosc/2; j++)
+        {
+            SDL_Color rgb555 = getRGB555(i, j);
+            Uint16 rgb555_ = getRGB555_(i, j);
+            setRGB555(i+szerokosc/2, j, rgb555.r, rgb555.g, rgb555.b);
+            setRGB555(i+szerokosc/2, j+wysokosc/2, rgb555_);
+        }
+
+    //test rgb565
+    for (int i=0; i<szerokosc/2; i++)
+        for (int j=0; j<wysokosc/2; j++)
+        {
+            SDL_Color rgb565 = getRGB565(i, j);
+            Uint16 rgb565_ = getRGB565_(i, j);
+            setRGB565(i+szerokosc/2, j, rgb565.r, rgb565.g, rgb565.b);
+            setRGB565(i+szerokosc/2, j+wysokosc/2, rgb565_);
+        }
+
+    //podprobkowanie yuv, yiq, ycbcr
+    for (int i=0; i<szerokosc; i+=2)
+        for (int j=0; j<wysokosc; j+=2)
+        {
+            podprobkowanieYUV(i, j, i+szerokosc/2, j);
+            podprobkowanieYIQ(i, j, i, j+wysokosc/2);
+            podprobkowanieYCbCr(i, j, i+szerokosc/2, j+wysokosc/2);
+        }
+
+    //podprobkowanie hsl
+    for (int i=0; i<szerokosc; i+=2)
+        for (int j=0; j<wysokosc; j+=2)
+        {
+            podprobkowanieH(i, j, i+szerokosc/2, j);
+            podprobkowanieS(i, j, i, j+wysokosc/2);
+            podprobkowanieL(i, j, i+szerokosc/2, j+wysokosc/2);
+        }
+ */
