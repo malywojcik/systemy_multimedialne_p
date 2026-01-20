@@ -7,14 +7,28 @@
 
 void Funkcja1()
 {
-    //...
+    //kompresja byterun
+    int nieskompresowane[] = {0, 0, 0, 0, 0, 1, 2, 3, 4, 5, 6, 7, 7, 7, 8, 8, 8, 8, 8, 8, 2, 2, 1, 3};
+    int dlugosc = 24;
+    cout<<"\nwejscie:\n";
+    for (int c =0; c<dlugosc-1; c++)
+        cout<<(int)nieskompresowane[c]<<", ";
+    cout<<(int)nieskompresowane[dlugosc-1]<<endl;
+    ByteRunKompresja(nieskompresowane, dlugosc);
 
     SDL_UpdateWindowSurface(window);
 }
 
 void Funkcja2()
 {
-    //...
+    //kompresja byterun
+    int nieskompresowane[] = {0, 0, 0, 0, 0, 1, 2, 3, 4, 5, 7, 7, 7, 8, 8, 8, 8, 8, 8, 2, 2, 1, 3, 1, 2};
+    int dlugosc = 25;
+    cout<<"\nwejscie:\n";
+    for (int c =0; c<dlugosc-1; c++)
+        cout<<(int)nieskompresowane[c]<<", ";
+    cout<<(int)nieskompresowane[dlugosc-1]<<endl;
+    RLEKompresja(nieskompresowane, dlugosc);
 
     SDL_UpdateWindowSurface(window);
 }
@@ -657,6 +671,75 @@ void podprobkowanieL(int xx, int yy, int x, int y)
     setHSL(x+1, y, p2.H, p2.S, avgL);
     setHSL(x, y+1, p3.H, p3.S, avgL);
     setHSL(x+1, y+1, p4.H, p4.S, avgL);
+}
+
+//p6
+void ByteRunKompresja(int wejscie[], int dlugosc)
+{
+    int i = 0;
+    while (i < dlugosc)
+    {
+        if ((i<dlugosc-1) && (wejscie[i] == wejscie[i+1]))
+        {
+            int j=0;
+            while ((i+j<dlugosc-1) && (wejscie[i+j] == wejscie[i+1+j]) && (j<127))
+                j++;
+            cout<<"("<<-j<<"), "<<(int)wejscie[i+j]<<", ";
+            i+=(j+1);
+        }
+        else
+        {
+            int j=0;
+            while ((i+j <dlugosc-1) && (wejscie[i+j] != wejscie[i+j+1]) && (j<128))
+                j++;
+            if ((i+j == dlugosc-1) && (j<128))
+                j++;
+            cout<<"("<<(j-1)<<"), ";
+            for (int k=0; k<j; k++)
+                cout<<(int)wejscie[i+k]<<", ";
+            i+=j;
+        }
+    }
+}
+
+void ByteRunDekompresja(int wejscie[], int dlugosc)
+{
+    //asd
+}
+
+void RLEKompresja(int wejscie[], int dlugosc)
+{
+    int i = 0;
+    while (i < dlugosc)
+    {
+        if ((i<dlugosc-1) && (wejscie[i] == wejscie[i+1]))
+        {
+            int j=0;
+            while ((i+j < dlugosc-1) && (wejscie[i+j] == wejscie[i+j+1]) && (j<254))
+                j++;
+            cout<<"("<<(j+1)<<"), "<<(int)wejscie[i+j]<<", ";
+            i+=(j+1);
+        }
+        else
+        {
+            int j=0;
+            while ((i+j < dlugosc-1) && (wejscie[i+j] != wejscie[i+j+1]) && (j<254))
+                j++;
+            if ((i+j == dlugosc-1) && (j<254))
+                j++;
+            cout<<(int) 0<<", "<<j<<", ";
+            for (int k=0; k<j; k++)
+                cout<<(int)wejscie[i+k]<<", ";
+            if (j%2 != 0)
+                cout<<(int) 0<<", ";
+            i+=j;
+        }
+    }
+}
+
+void RLEDekompresja(int wejscie[], int dlugosc)
+{
+    //asd
 }
 
 /*

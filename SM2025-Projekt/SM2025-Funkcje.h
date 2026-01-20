@@ -77,4 +77,10 @@ void podprobkowanieH(int xx, int yy, int x, int y);
 void podprobkowanieS(int xx, int yy, int x, int y);
 void podprobkowanieL(int xx, int yy, int x, int y);
 
+//p6
+void ByteRunKompresja(int wejscie[], int dlugosc);
+void ByteRunDekompresja(int wejscie[], int dlugosc);
+void RLEKompresja(int wejscie[], int dlugosc);
+void RLEDekompresja(int wejscie[], int dlugosc);
+
 #endif // SM2025_FUNKCJE_H_INCLUDED
