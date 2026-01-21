@@ -11,10 +11,12 @@ void Funkcja1()
     int nieskompresowane[] = {0, 0, 0, 0, 0, 1, 2, 3, 4, 5, 6, 7, 7, 7, 8, 8, 8, 8, 8, 8, 2, 2, 1, 3};
     int dlugosc = 24;
     cout<<"\nwejscie:\n";
-    for (int c =0; c<dlugosc-1; c++)
+    for (int c =0; c<dlugosc; c++)
         cout<<(int)nieskompresowane[c]<<", ";
-    cout<<(int)nieskompresowane[dlugosc-1]<<endl;
-    ByteRunKompresja(nieskompresowane, dlugosc);
+    cout<<endl;
+
+    ByteRunKompresja(nieskompresowane, dlugosc, "byterun.bin");
+    ByteRunDekompresja("byterun.bin");
 
     SDL_UpdateWindowSurface(window);
 }
@@ -25,10 +27,12 @@ void Funkcja2()
     int nieskompresowane[] = {0, 0, 0, 0, 0, 1, 2, 3, 4, 5, 7, 7, 7, 8, 8, 8, 8, 8, 8, 2, 2, 1, 3, 1, 2};
     int dlugosc = 25;
     cout<<"\nwejscie:\n";
-    for (int c =0; c<dlugosc-1; c++)
+    for (int c =0; c<dlugosc; c++)
         cout<<(int)nieskompresowane[c]<<", ";
-    cout<<(int)nieskompresowane[dlugosc-1]<<endl;
-    RLEKompresja(nieskompresowane, dlugosc);
+    cout<<endl;
+
+    RLEKompresja(nieskompresowane, dlugosc, "rle.bin");
+    RLEDekompresja("rle.bin");
 
     SDL_UpdateWindowSurface(window);
 }
@@ -674,9 +678,16 @@ void podprobkowanieL(int xx, int yy, int x, int y)
 }
 
 //p6
-void ByteRunKompresja(int wejscie[], int dlugosc)
+void ByteRunKompresja(int wejscie[], int dlugosc, const char* nazwaPliku)
 {
-    int i = 0;
+    ofstream plik(nazwaPliku, ios::binary);
+    if (!plik)
+    {
+        cout<<"Blad otwarcia pliku do zapisu!"<<endl;
+        return;
+    }
+
+    int i = 0, skompresowanyRozmiar = 0;
     while (i < dlugosc)
     {
         if ((i<dlugosc-1) && (wejscie[i] == wejscie[i+1]))
@@ -684,8 +695,13 @@ void ByteRunKompresja(int wejscie[], int dlugosc)
             int j=0;
             while ((i+j<dlugosc-1) && (wejscie[i+j] == wejscie[i+1+j]) && (j<127))
                 j++;
-            cout<<"("<<-j<<"), "<<(int)wejscie[i+j]<<", ";
-            i+=(j+1);
+            char flaga = (char)(-j);
+            plik.write(&flaga, 1);
+            char wartosc = (char)(wejscie[i]);
+            plik.write(&wartosc, 1);
+
+            skompresowanyRozmiar +=2;
+            i += (j+1);
         }
         else
         {
@@ -694,22 +710,73 @@ void ByteRunKompresja(int wejscie[], int dlugosc)
                 j++;
             if ((i+j == dlugosc-1) && (j<128))
                 j++;
-            cout<<"("<<(j-1)<<"), ";
+
+            char flaga = (char)(j-1);
+            plik.write(&flaga, 1);
+
             for (int k=0; k<j; k++)
-                cout<<(int)wejscie[i+k]<<", ";
+            {
+                char wartosc = (char)(wejscie[i+k]);
+                plik.write(&wartosc, 1);
+            }
+            skompresowanyRozmiar += (1 + j);
             i+=j;
         }
     }
+    plik.close();
+    cout<<"\nByteRun Kompresja\n";
+    cout<<"Rozmiar oryginalny: "<<dlugosc<<" bajtow\n";
+    cout<<"Rozmiar skompresowany: "<<skompresowanyRozmiar<<" bajtow\n";
+    float wspolczynnik = (float)dlugosc / (float)skompresowanyRozmiar;
+    cout<<"Wspolczynnik kompresji: "<<wspolczynnik<<"\n\n";
 }
 
-void ByteRunDekompresja(int wejscie[], int dlugosc)
+void ByteRunDekompresja(const char* nazwaPliku)
 {
-    //asd
+    ifstream plik(nazwaPliku, ios::binary);
+    if (!plik)
+    {
+        cout<<"Blad otwarcia pliku do odczytu!"<<endl;
+        return;
+    }
+
+    cout<<"ByteRun Dekompresja:\n";
+    char flaga;
+    while (plik.read(&flaga, 1))
+    {
+        if (flaga < 0)
+        {
+            int count = (-flaga) + 1;
+            char wartosc;
+            plik.read(&wartosc, 1);
+            for (int i = 0; i < count; i++)
+                cout<<(int)(unsigned char)wartosc<<", ";
+        }
+        else
+        {
+            int count = flaga + 1;
+            char wartosc;
+            for (int i = 0; i < count; i++)
+            {
+                plik.read(&wartosc, 1);
+                cout<<(int)(unsigned char)wartosc<<", ";
+            }
+        }
+    }
+    cout<<endl;
+    plik.close();
 }
 
-void RLEKompresja(int wejscie[], int dlugosc)
+void RLEKompresja(int wejscie[], int dlugosc, const char* nazwaPliku)
 {
-    int i = 0;
+    ofstream plik(nazwaPliku, ios::binary);
+    if (!plik)
+    {
+        cout<<"Blad otwarcia pliku do zapisu!"<<endl;
+        return;
+    }
+
+    int i = 0, skompresowanyRozmiar = 0;
     while (i < dlugosc)
     {
         if ((i<dlugosc-1) && (wejscie[i] == wejscie[i+1]))
@@ -717,7 +784,11 @@ void RLEKompresja(int wejscie[], int dlugosc)
             int j=0;
             while ((i+j < dlugosc-1) && (wejscie[i+j] == wejscie[i+j+1]) && (j<254))
                 j++;
-            cout<<"("<<(j+1)<<"), "<<(int)wejscie[i+j]<<", ";
+            char count = (char)(j + 1);
+            char wartosc = (char)wejscie[i];
+            plik.write(&count, 1);
+            plik.write(&wartosc, 1);
+            skompresowanyRozmiar += 2;
             i+=(j+1);
         }
         else
@@ -727,19 +798,78 @@ void RLEKompresja(int wejscie[], int dlugosc)
                 j++;
             if ((i+j == dlugosc-1) && (j<254))
                 j++;
-            cout<<(int) 0<<", "<<j<<", ";
+
+            char marker = 0;
+            char count = (char)j;
+            plik.write(&marker, 1);
+            plik.write(&count, 1);
+
             for (int k=0; k<j; k++)
-                cout<<(int)wejscie[i+k]<<", ";
+            {
+                char wartosc = (char)wejscie[i+k];
+                plik.write(&wartosc, 1);
+            }
+            skompresowanyRozmiar += (2+j);
+
             if (j%2 != 0)
-                cout<<(int) 0<<", ";
+            {
+                char pad = 0;
+                plik.write(&pad, 1);
+                skompresowanyRozmiar ++;
+            }
             i+=j;
         }
     }
+    plik.close();
+    cout<<"\nRLE Kompresja\n";
+    cout<<"Rozmiar oryginalny: "<<dlugosc<<" bajtow\n";
+    cout<<"Rozmiar skompresowany: "<<skompresowanyRozmiar<<" bajtow\n";
+    float wspolczynnik = (float)dlugosc / (float)skompresowanyRozmiar;
+    cout<<"Wspolczynnik kompresji: "<<wspolczynnik<<"\n\n";
 }
 
-void RLEDekompresja(int wejscie[], int dlugosc)
+void RLEDekompresja(const char* nazwaPliku)
 {
-    //asd
+    ifstream plik(nazwaPliku, ios::binary);
+    if (!plik)
+    {
+        cout<<"Blad otwarcia pliku do odczytu!"<<endl;
+        return;
+    }
+
+    cout<<"RLE Dekompresja:\n";
+    char marker;
+    while (plik.read(&marker, 1))
+    {
+        unsigned char count = (unsigned char)marker;
+
+        if (count > 0)
+        {
+            char wartosc;
+            plik.read(&wartosc, 1);
+            for (int i = 0; i < count; i++)
+                cout<<(int)(unsigned char)wartosc<<", ";
+        }
+        else
+        {
+            char countByte, wartosc;
+            if(!plik.read(&countByte, 1))
+                break;
+            unsigned char count2 = (unsigned char)countByte;
+
+            for (int i = 0; i < count2; i++)
+            {
+                plik.read(&wartosc, 1);
+                cout<<(int)(unsigned char)wartosc<<", ";
+            }
+            if (count2 % 2 != 0)
+            {
+                char pad;
+                plik.read(&pad, 1);
+            }
+        }
+    }
+    plik.close();
 }
 
 /*
@@ -808,4 +938,22 @@ void RLEDekompresja(int wejscie[], int dlugosc)
             podprobkowanieS(i, j, i, j+wysokosc/2);
             podprobkowanieL(i, j, i+szerokosc/2, j+wysokosc/2);
         }
+
+    //kompresja byterun
+    int nieskompresowane[] = {0, 0, 0, 0, 0, 1, 2, 3, 4, 5, 6, 7, 7, 7, 8, 8, 8, 8, 8, 8, 2, 2, 1, 3};
+    int dlugosc = 24;
+    cout<<"\nwejscie:\n";
+    for (int c =0; c<dlugosc-1; c++)
+        cout<<(int)nieskompresowane[c]<<", ";
+    cout<<(int)nieskompresowane[dlugosc-1]<<endl;
+    ByteRunKompresja(nieskompresowane, dlugosc);
+
+    //kompresja byterun
+    int nieskompresowane[] = {0, 0, 0, 0, 0, 1, 2, 3, 4, 5, 7, 7, 7, 8, 8, 8, 8, 8, 8, 2, 2, 1, 3, 1, 2};
+    int dlugosc = 25;
+    cout<<"\nwejscie:\n";
+    for (int c =0; c<dlugosc-1; c++)
+        cout<<(int)nieskompresowane[c]<<", ";
+    cout<<(int)nieskompresowane[dlugosc-1]<<endl;
+    RLEKompresja(nieskompresowane, dlugosc);
  */

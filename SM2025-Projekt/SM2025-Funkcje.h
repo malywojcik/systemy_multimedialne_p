@@ -78,9 +78,9 @@ void podprobkowanieS(int xx, int yy, int x, int y);
 void podprobkowanieL(int xx, int yy, int x, int y);
 
 //p6
-void ByteRunKompresja(int wejscie[], int dlugosc);
-void ByteRunDekompresja(int wejscie[], int dlugosc);
-void RLEKompresja(int wejscie[], int dlugosc);
-void RLEDekompresja(int wejscie[], int dlugosc);
+void ByteRunKompresja(int wejscie[], int dlugosc, const char* nazwaPliku);
+void ByteRunDekompresja(const char* nazwaPliku);
+void RLEKompresja(int wejscie[], int dlugosc, const char* nazwaPliku);
+void RLEDekompresja(const char* nazwaPliku);
 
 #endif // SM2025_FUNKCJE_H_INCLUDED
