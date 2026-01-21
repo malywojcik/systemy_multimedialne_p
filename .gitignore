@@ -10,3 +10,7 @@
 *.tlog
 *.lastbuildstate
 *.xml
+*.layout
+*.depend
+
+!lister.exe
