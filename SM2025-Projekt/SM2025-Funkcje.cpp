@@ -5,34 +5,30 @@
 #include "SM2025-MedianCut.h"
 #include "SM2025-Pliki.h"
 
+#include <vector>
+
 void Funkcja1()
 {
-    //kompresja byterun
-    int nieskompresowane[] = {0, 0, 0, 0, 0, 1, 2, 3, 4, 5, 6, 7, 7, 7, 8, 8, 8, 8, 8, 8, 2, 2, 1, 3};
-    int dlugosc = 24;
-    cout<<"\nwejscie:\n";
-    for (int c =0; c<dlugosc; c++)
-        cout<<(int)nieskompresowane[c]<<", ";
-    cout<<endl;
+    //lzw
+    int nieskompresowane[] = {
+        0, 0, 0, 1, 1, 1, 1, 2, 0, 0, 3, 1,
+        3, 2, 2, 0, 0, 0, 3, 3, 3, 3, 1, 2,
+        1, 2, 3, 1, 2, 0, 0, 1, 1, 1, 3, 3
+    };
+    int dlugosc = 36;
+    for (int c = 0; c < dlugosc; c++)
+        cout << (int) nieskompresowane[c] << ", ";
+    cout << endl;
 
-    ByteRunKompresja(nieskompresowane, dlugosc, "byterun.bin");
-    ByteRunDekompresja("byterun.bin");
+    LZWKompresja(nieskompresowane, dlugosc, "lzw.bin");
+    LZWDekompresja("lzw.bin");
 
     SDL_UpdateWindowSurface(window);
 }
 
 void Funkcja2()
 {
-    //kompresja byterun
-    int nieskompresowane[] = {0, 0, 0, 0, 0, 1, 2, 3, 4, 5, 7, 7, 7, 8, 8, 8, 8, 8, 8, 2, 2, 1, 3, 1, 2};
-    int dlugosc = 25;
-    cout<<"\nwejscie:\n";
-    for (int c =0; c<dlugosc; c++)
-        cout<<(int)nieskompresowane[c]<<", ";
-    cout<<endl;
-
-    RLEKompresja(nieskompresowane, dlugosc, "rle.bin");
-    RLEDekompresja("rle.bin");
+    //...
 
     SDL_UpdateWindowSurface(window);
 }
@@ -88,133 +84,138 @@ void Funkcja9()
 
 void setPixel(int x, int y, Uint8 R, Uint8 G, Uint8 B)
 {
-  if ((x>=0) && (x<szerokosc) && (y>=0) && (y<wysokosc))
-  {
-    /* Zamieniamy poszczególne składowe koloru na format koloru piksela */
-    Uint32 pixel = SDL_MapRGB(screen->format, R, G, B);
-
-    /* Pobieramy informację ile bajtów zajmuje jeden piksel */
-    int bpp = screen->format->BytesPerPixel;
-
-    /* Obliczamy adres piksela */
-    Uint8 *p1 = (Uint8 *)screen->pixels + (y*2) * screen->pitch + (x*2) * bpp;
-    Uint8 *p2 = (Uint8 *)screen->pixels + (y*2+1) * screen->pitch + (x*2) * bpp;
-    Uint8 *p3 = (Uint8 *)screen->pixels + (y*2) * screen->pitch + (x*2+1) * bpp;
-    Uint8 *p4 = (Uint8 *)screen->pixels + (y*2+1) * screen->pitch + (x*2+1) * bpp;
-
-    /* Ustawiamy wartość piksela, w zależnoœci od formatu powierzchni*/
-    switch(bpp)
+    if ((x >= 0) && (x < szerokosc) && (y >= 0) && (y < wysokosc))
     {
-        case 1: //8-bit
-            *p1 = pixel;
-            *p2 = pixel;
-            *p3 = pixel;
-            *p4 = pixel;
-            break;
+        /* Zamieniamy poszczególne składowe koloru na format koloru piksela */
+        Uint32 pixel = SDL_MapRGB(screen->format, R, G, B);
 
-        case 2: //16-bit
-            *(Uint16 *)p1 = pixel;
-            *(Uint16 *)p2 = pixel;
-            *(Uint16 *)p3 = pixel;
-            *(Uint16 *)p4 = pixel;
-            break;
+        /* Pobieramy informację ile bajtów zajmuje jeden piksel */
+        int bpp = screen->format->BytesPerPixel;
 
-        case 3: //24-bit
-            if(SDL_BYTEORDER == SDL_BIG_ENDIAN) {
-                p1[0] = (pixel >> 16) & 0xff;
-                p1[1] = (pixel >> 8) & 0xff;
-                p1[2] = pixel & 0xff;
-                p2[0] = (pixel >> 16) & 0xff;
-                p2[1] = (pixel >> 8) & 0xff;
-                p2[2] = pixel & 0xff;
-                p3[0] = (pixel >> 16) & 0xff;
-                p3[1] = (pixel >> 8) & 0xff;
-                p3[2] = pixel & 0xff;
-                p4[0] = (pixel >> 16) & 0xff;
-                p4[1] = (pixel >> 8) & 0xff;
-                p4[2] = pixel & 0xff;
-            } else {
-                p1[0] = pixel & 0xff;
-                p1[1] = (pixel >> 8) & 0xff;
-                p1[2] = (pixel >> 16) & 0xff;
-                p2[0] = pixel & 0xff;
-                p2[1] = (pixel >> 8) & 0xff;
-                p2[2] = (pixel >> 16) & 0xff;
-                p3[0] = pixel & 0xff;
-                p3[1] = (pixel >> 8) & 0xff;
-                p3[2] = (pixel >> 16) & 0xff;
-                p4[0] = pixel & 0xff;
-                p4[1] = (pixel >> 8) & 0xff;
-                p4[2] = (pixel >> 16) & 0xff;
-            }
-            break;
+        /* Obliczamy adres piksela */
+        Uint8 *p1 = (Uint8 *) screen->pixels + (y * 2) * screen->pitch + (x * 2) * bpp;
+        Uint8 *p2 = (Uint8 *) screen->pixels + (y * 2 + 1) * screen->pitch + (x * 2) * bpp;
+        Uint8 *p3 = (Uint8 *) screen->pixels + (y * 2) * screen->pitch + (x * 2 + 1) * bpp;
+        Uint8 *p4 = (Uint8 *) screen->pixels + (y * 2 + 1) * screen->pitch + (x * 2 + 1) * bpp;
 
-        case 4: //32-bit
-            *(Uint32 *)p1 = pixel;
-            *(Uint32 *)p2 = pixel;
-            *(Uint32 *)p3 = pixel;
-            *(Uint32 *)p4 = pixel;
-            break;
+        /* Ustawiamy wartość piksela, w zależnoœci od formatu powierzchni*/
+        switch (bpp)
+        {
+            case 1: //8-bit
+                *p1 = pixel;
+                *p2 = pixel;
+                *p3 = pixel;
+                *p4 = pixel;
+                break;
 
+            case 2: //16-bit
+                *(Uint16 *) p1 = pixel;
+                *(Uint16 *) p2 = pixel;
+                *(Uint16 *) p3 = pixel;
+                *(Uint16 *) p4 = pixel;
+                break;
+
+            case 3: //24-bit
+                if (SDL_BYTEORDER == SDL_BIG_ENDIAN)
+                {
+                    p1[0] = (pixel >> 16) & 0xff;
+                    p1[1] = (pixel >> 8) & 0xff;
+                    p1[2] = pixel & 0xff;
+                    p2[0] = (pixel >> 16) & 0xff;
+                    p2[1] = (pixel >> 8) & 0xff;
+                    p2[2] = pixel & 0xff;
+                    p3[0] = (pixel >> 16) & 0xff;
+                    p3[1] = (pixel >> 8) & 0xff;
+                    p3[2] = pixel & 0xff;
+                    p4[0] = (pixel >> 16) & 0xff;
+                    p4[1] = (pixel >> 8) & 0xff;
+                    p4[2] = pixel & 0xff;
+                } else
+                {
+                    p1[0] = pixel & 0xff;
+                    p1[1] = (pixel >> 8) & 0xff;
+                    p1[2] = (pixel >> 16) & 0xff;
+                    p2[0] = pixel & 0xff;
+                    p2[1] = (pixel >> 8) & 0xff;
+                    p2[2] = (pixel >> 16) & 0xff;
+                    p3[0] = pixel & 0xff;
+                    p3[1] = (pixel >> 8) & 0xff;
+                    p3[2] = (pixel >> 16) & 0xff;
+                    p4[0] = pixel & 0xff;
+                    p4[1] = (pixel >> 8) & 0xff;
+                    p4[2] = (pixel >> 16) & 0xff;
+                }
+                break;
+
+            case 4: //32-bit
+                *(Uint32 *) p1 = pixel;
+                *(Uint32 *) p2 = pixel;
+                *(Uint32 *) p3 = pixel;
+                *(Uint32 *) p4 = pixel;
+                break;
         }
     }
 }
 
 void setPixelSurface(int x, int y, Uint8 R, Uint8 G, Uint8 B)
 {
-  if ((x>=0) && (x<szerokosc*2) && (y>=0) && (y<wysokosc*2))
-  {
-    /* Zamieniamy poszczególne składowe koloru na format koloru piksela */
-    Uint32 pixel = SDL_MapRGB(screen->format, R, G, B);
-
-    /* Pobieramy informację ile bajtów zajmuje jeden piksel */
-    int bpp = screen->format->BytesPerPixel;
-
-    /* Obliczamy adres piksela */
-    Uint8 *p = (Uint8 *)screen->pixels + y * screen->pitch + x * bpp;
-
-    /* Ustawiamy wartość piksela, w zależności od formatu powierzchni*/
-    switch(bpp)
+    if ((x >= 0) && (x < szerokosc * 2) && (y >= 0) && (y < wysokosc * 2))
     {
-        case 1: //8-bit
-            *p = pixel;
-            break;
+        /* Zamieniamy poszczególne składowe koloru na format koloru piksela */
+        Uint32 pixel = SDL_MapRGB(screen->format, R, G, B);
 
-        case 2: //16-bit
-            *(Uint16 *)p = pixel;
-            break;
+        /* Pobieramy informację ile bajtów zajmuje jeden piksel */
+        int bpp = screen->format->BytesPerPixel;
 
-        case 3: //24-bit
-            if(SDL_BYTEORDER == SDL_BIG_ENDIAN) {
-                p[0] = (pixel >> 16) & 0xff;
-                p[1] = (pixel >> 8) & 0xff;
-                p[2] = pixel & 0xff;
-            } else {
-                p[0] = pixel & 0xff;
-                p[1] = (pixel >> 8) & 0xff;
-                p[2] = (pixel >> 16) & 0xff;
-            }
-            break;
+        /* Obliczamy adres piksela */
+        Uint8 *p = (Uint8 *) screen->pixels + y * screen->pitch + x * bpp;
 
-        case 4: //32-bit
-            *(Uint32 *)p = pixel;
-            break;
+        /* Ustawiamy wartość piksela, w zależności od formatu powierzchni*/
+        switch (bpp)
+        {
+            case 1: //8-bit
+                *p = pixel;
+                break;
+
+            case 2: //16-bit
+                *(Uint16 *) p = pixel;
+                break;
+
+            case 3: //24-bit
+                if (SDL_BYTEORDER == SDL_BIG_ENDIAN)
+                {
+                    p[0] = (pixel >> 16) & 0xff;
+                    p[1] = (pixel >> 8) & 0xff;
+                    p[2] = pixel & 0xff;
+                } else
+                {
+                    p[0] = pixel & 0xff;
+                    p[1] = (pixel >> 8) & 0xff;
+                    p[2] = (pixel >> 16) & 0xff;
+                }
+                break;
+
+            case 4: //32-bit
+                *(Uint32 *) p = pixel;
+                break;
         }
     }
 }
 
-SDL_Color getPixel(int x, int y) {
-    SDL_Color color ;
-    Uint32 col = 0 ;
-    if ((x>=0) && (x<szerokosc) && (y>=0) && (y<wysokosc)) {
+SDL_Color getPixel(int x, int y)
+{
+    SDL_Color color;
+    Uint32 col = 0;
+    if ((x >= 0) && (x < szerokosc) && (y >= 0) && (y < wysokosc))
+    {
         //określamy pozycję
-        char* pPosition=(char*)screen->pixels ;
+        char *pPosition = (char *) screen->pixels;
 
         //przesunięcie względem y
-        pPosition+=(screen->pitch*y*2) ;
+        pPosition += (screen->pitch * y * 2);
 
         //przesunięcie względem x
-        pPosition+=(screen->format->BytesPerPixel*x*2);
+        pPosition += (screen->format->BytesPerPixel * x * 2);
 
         //kopiujemy dane piksela
         memcpy(&col, pPosition, screen->format->BytesPerPixel);
@@ -222,21 +223,23 @@ SDL_Color getPixel(int x, int y) {
         //konwertujemy kolor
         SDL_GetRGB(col, screen->format, &color.r, &color.g, &color.b);
     }
-    return ( color ) ;
+    return (color);
 }
 
-SDL_Color getPixelSurface(int x, int y, SDL_Surface *surface) {
-    SDL_Color color ;
-    Uint32 col = 0 ;
-    if ((x>=0) && (x<szerokosc) && (y>=0) && (y<wysokosc)) {
+SDL_Color getPixelSurface(int x, int y, SDL_Surface *surface)
+{
+    SDL_Color color;
+    Uint32 col = 0;
+    if ((x >= 0) && (x < szerokosc) && (y >= 0) && (y < wysokosc))
+    {
         //określamy pozycję
-        char* pPosition=(char*)surface->pixels ;
+        char *pPosition = (char *) surface->pixels;
 
         //przesunięcie względem y
-        pPosition+=(surface->pitch*y) ;
+        pPosition += (surface->pitch * y);
 
         //przesunięcie względem x
-        pPosition+=(surface->format->BytesPerPixel*x);
+        pPosition += (surface->format->BytesPerPixel * x);
 
         //kopiujemy dane piksela
         memcpy(&col, pPosition, surface->format->BytesPerPixel);
@@ -244,28 +247,29 @@ SDL_Color getPixelSurface(int x, int y, SDL_Surface *surface) {
         //konwertujemy kolor
         SDL_GetRGB(col, surface->format, &color.r, &color.g, &color.b);
     }
-    return ( color ) ;
+    return (color);
 }
 
-void ladujBMP(char const* nazwa, int x, int y) {
-    SDL_Surface* bmp = SDL_LoadBMP(nazwa);
+void ladujBMP(char const *nazwa, int x, int y)
+{
+    SDL_Surface *bmp = SDL_LoadBMP(nazwa);
     if (!bmp)
     {
         printf("Unable to load bitmap: %s\n", SDL_GetError());
-    }
-    else
+    } else
     {
         SDL_Color kolor;
-        for (int yy=0; yy<bmp->h; yy++) {
-			for (int xx=0; xx<bmp->w; xx++) {
-				kolor = getPixelSurface(xx, yy, bmp);
-				setPixel(xx, yy, kolor.r, kolor.g, kolor.b);
-			}
+        for (int yy = 0; yy < bmp->h; yy++)
+        {
+            for (int xx = 0; xx < bmp->w; xx++)
+            {
+                kolor = getPixelSurface(xx, yy, bmp);
+                setPixel(xx, yy, kolor.r, kolor.g, kolor.b);
+            }
         }
-		SDL_FreeSurface(bmp);
+        SDL_FreeSurface(bmp);
         SDL_UpdateWindowSurface(window);
     }
-
 }
 
 void czyscEkran(Uint8 R, Uint8 G, Uint8 B)
@@ -295,9 +299,9 @@ void setYUV(int xx, int yy, float y, float u, float v)
     if (b < 0.0f) b = 0.0f;
     if (b > 255.0f) b = 255.0f;
 
-    R = (Uint8)r;
-    G = (Uint8)g;
-    B = (Uint8)b;
+    R = (Uint8) r;
+    G = (Uint8) g;
+    B = (Uint8) b;
 
     setPixel(xx, yy, R, G, B);
 }
@@ -313,7 +317,7 @@ YUV getYUV(int xx, int yy)
     b = kolor.b / 255.0f;
 
     yuv.Y = 0.299f * r + 0.587f * g + 0.114 * b;
-    yuv.U = - 0.14713f * r - 0.28886f * g + 0.436f * b;
+    yuv.U = -0.14713f * r - 0.28886f * g + 0.436f * b;
     yuv.V = 0.615f * r - 0.51499f * g - 0.10001f * b;
 
     return yuv;
@@ -339,9 +343,9 @@ void setYIQ(int xx, int yy, float y, float i, float q)
     if (b < 0.0f) b = 0.0f;
     if (b > 255.0f) b = 255.0f;
 
-    R = (Uint8)r;
-    G = (Uint8)g;
-    B = (Uint8)b;
+    R = (Uint8) r;
+    G = (Uint8) g;
+    B = (Uint8) b;
 
     setPixel(xx, yy, R, G, B);
 }
@@ -376,9 +380,9 @@ void setYCbCr(int xx, int yy, float y, float cb, float cr)
     G = (g > 255) ? 255 : g;
     B = (b > 255) ? 255 : b;
 
-    R = (Uint8)(r < 0) ? 0 : r;
-    G = (Uint8)(g < 0) ? 0 : g;
-    B = (Uint8)(b < 0) ? 0 : b;
+    R = (Uint8) (r < 0) ? 0 : r;
+    G = (Uint8) (g < 0) ? 0 : g;
+    B = (Uint8) (b < 0) ? 0 : b;
 
     setPixel(xx, yy, R, G, B);
 }
@@ -405,9 +409,9 @@ void setHSL(int xx, int yy, float h, float s, float l)
 
     if (s == 0.0f)
     {
-        R = (Uint8)(l * 255.0f);
-        G = (Uint8)(l * 255.0f);
-        B = (Uint8)(l * 255.0f);
+        R = (Uint8) (l * 255.0f);
+        G = (Uint8) (l * 255.0f);
+        B = (Uint8) (l * 255.0f);
         setPixel(xx, yy, R, G, B);
         return;
     }
@@ -458,9 +462,9 @@ void setHSL(int xx, int yy, float h, float s, float l)
     else
         b = z2;
 
-    R = (Uint8)(r * 255.0f);
-    G = (Uint8)(g * 255.0f);
-    B = (Uint8)(b * 255.0f);
+    R = (Uint8) (r * 255.0f);
+    G = (Uint8) (g * 255.0f);
+    B = (Uint8) (b * 255.0f);
 
     setPixel(xx, yy, R, G, B);
 }
@@ -483,8 +487,7 @@ HSL getHSL(int xx, int yy)
     {
         hsl.H = 0.0f;
         hsl.S = 0.0f;
-    }
-    else
+    } else
     {
         hsl.S = (hsl.L < 0.5f) ? (max - min) / (max + min) : (max - min) / (2.0f - max - min);
 
@@ -569,7 +572,7 @@ Uint16 getRGB565_(int xx, int yy)
 {
     SDL_Color kolor = getPixel(xx, yy);
 
-    return ((kolor.r >>3) << 11 | ((kolor.g >> 2) << 5) | (kolor.b >> 3));
+    return ((kolor.r >> 3) << 11 | ((kolor.g >> 2) << 5) | (kolor.b >> 3));
 }
 
 void podprobkowanieYUV(int xx, int yy, int x, int y)
@@ -577,17 +580,17 @@ void podprobkowanieYUV(int xx, int yy, int x, int y)
     YUV p1, p2, p3, p4;
     float avgU, avgV;
     p1 = getYUV(xx, yy);
-    p2 = getYUV(xx+1, yy);
-    p3 = getYUV(xx, yy+1);
-    p4 = getYUV(xx+1, yy+1);
+    p2 = getYUV(xx + 1, yy);
+    p3 = getYUV(xx, yy + 1);
+    p4 = getYUV(xx + 1, yy + 1);
 
     avgU = (p1.U + p2.U + p3.U + p4.U) / 4.0f;
     avgV = (p1.V + p2.V + p3.V + p4.V) / 4.0f;
 
     setYUV(x, y, p1.Y, avgU, avgV);
-    setYUV(x+1, y, p2.Y, avgU, avgV);
-    setYUV(x, y+1, p3.Y, avgU, avgV);
-    setYUV(x+1, y+1, p4.Y, avgU, avgV);
+    setYUV(x + 1, y, p2.Y, avgU, avgV);
+    setYUV(x, y + 1, p3.Y, avgU, avgV);
+    setYUV(x + 1, y + 1, p4.Y, avgU, avgV);
 }
 
 void podprobkowanieYIQ(int xx, int yy, int x, int y)
@@ -595,17 +598,17 @@ void podprobkowanieYIQ(int xx, int yy, int x, int y)
     YIQ p1, p2, p3, p4;
     float avgI, avgQ;
     p1 = getYIQ(xx, yy);
-    p2 = getYIQ(xx+1, yy);
-    p3 = getYIQ(xx, yy+1);
-    p4 = getYIQ(xx+1, yy+1);
+    p2 = getYIQ(xx + 1, yy);
+    p3 = getYIQ(xx, yy + 1);
+    p4 = getYIQ(xx + 1, yy + 1);
 
     avgI = (p1.I + p2.I + p3.I + p4.I) / 4.0f;
     avgQ = (p1.Q + p2.Q + p3.Q + p4.Q) / 4.0f;
 
     setYIQ(x, y, p1.Y, avgI, avgQ);
-    setYIQ(x+1, y, p2.Y, avgI, avgQ);
-    setYIQ(x, y+1, p3.Y, avgI, avgQ);
-    setYIQ(x+1, y+1, p4.Y, avgI, avgQ);
+    setYIQ(x + 1, y, p2.Y, avgI, avgQ);
+    setYIQ(x, y + 1, p3.Y, avgI, avgQ);
+    setYIQ(x + 1, y + 1, p4.Y, avgI, avgQ);
 }
 
 void podprobkowanieYCbCr(int xx, int yy, int x, int y)
@@ -613,17 +616,17 @@ void podprobkowanieYCbCr(int xx, int yy, int x, int y)
     YCbCr p1, p2, p3, p4;
     float avgCb, avgCr;
     p1 = getYCbCr(xx, yy);
-    p2 = getYCbCr(xx+1, yy);
-    p3 = getYCbCr(xx, yy+1);
-    p4 = getYCbCr(xx+1, yy+1);
+    p2 = getYCbCr(xx + 1, yy);
+    p3 = getYCbCr(xx, yy + 1);
+    p4 = getYCbCr(xx + 1, yy + 1);
 
     avgCb = (p1.Cb + p2.Cb + p3.Cb + p4.Cb) / 4.0f;
     avgCr = (p1.Cr + p2.Cr + p3.Cr + p4.Cr) / 4.0f;
 
     setYCbCr(x, y, p1.Y, avgCb, avgCr);
-    setYCbCr(x+1, y, p2.Y, avgCb, avgCr);
-    setYCbCr(x, y+1, p3.Y, avgCb, avgCr);
-    setYCbCr(x+1, y+1, p4.Y, avgCb, avgCr);
+    setYCbCr(x + 1, y, p2.Y, avgCb, avgCr);
+    setYCbCr(x, y + 1, p3.Y, avgCb, avgCr);
+    setYCbCr(x + 1, y + 1, p4.Y, avgCb, avgCr);
 }
 
 void podprobkowanieH(int xx, int yy, int x, int y)
@@ -631,16 +634,16 @@ void podprobkowanieH(int xx, int yy, int x, int y)
     HSL p1, p2, p3, p4;
     float avgH;
     p1 = getHSL(xx, yy);
-    p2 = getHSL(xx+1, yy);
-    p3 = getHSL(xx, yy+1);
-    p4 = getHSL(xx+1, yy+1);
+    p2 = getHSL(xx + 1, yy);
+    p3 = getHSL(xx, yy + 1);
+    p4 = getHSL(xx + 1, yy + 1);
 
     avgH = (p1.H + p2.H + p3.H + p4.H) / 4.0f;
 
     setHSL(x, y, avgH, p1.S, p1.L);
-    setHSL(x+1, y, avgH, p2.S, p2.L);
-    setHSL(x, y+1, avgH, p3.S, p3.L);
-    setHSL(x+1, y+1, avgH, p4.S, p4.L);
+    setHSL(x + 1, y, avgH, p2.S, p2.L);
+    setHSL(x, y + 1, avgH, p3.S, p3.L);
+    setHSL(x + 1, y + 1, avgH, p4.S, p4.L);
 }
 
 void podprobkowanieS(int xx, int yy, int x, int y)
@@ -648,16 +651,16 @@ void podprobkowanieS(int xx, int yy, int x, int y)
     HSL p1, p2, p3, p4;
     float avgS;
     p1 = getHSL(xx, yy);
-    p2 = getHSL(xx+1, yy);
-    p3 = getHSL(xx, yy+1);
-    p4 = getHSL(xx+1, yy+1);
+    p2 = getHSL(xx + 1, yy);
+    p3 = getHSL(xx, yy + 1);
+    p4 = getHSL(xx + 1, yy + 1);
 
     avgS = (p1.S + p2.S + p3.S + p4.S) / 4.0f;
 
     setHSL(x, y, p1.H, avgS, p1.L);
-    setHSL(x+1, y, p2.H, avgS, p2.L);
-    setHSL(x, y+1, p3.H, avgS, p3.L);
-    setHSL(x+1, y+1, p4.H, avgS, p4.L);
+    setHSL(x + 1, y, p2.H, avgS, p2.L);
+    setHSL(x, y + 1, p3.H, avgS, p3.L);
+    setHSL(x + 1, y + 1, p4.H, avgS, p4.L);
 }
 
 void podprobkowanieL(int xx, int yy, int x, int y)
@@ -665,82 +668,81 @@ void podprobkowanieL(int xx, int yy, int x, int y)
     HSL p1, p2, p3, p4;
     float avgL;
     p1 = getHSL(xx, yy);
-    p2 = getHSL(xx+1, yy);
-    p3 = getHSL(xx, yy+1);
-    p4 = getHSL(xx+1, yy+1);
+    p2 = getHSL(xx + 1, yy);
+    p3 = getHSL(xx, yy + 1);
+    p4 = getHSL(xx + 1, yy + 1);
 
     avgL = (p1.L + p2.L + p3.L + p4.L) / 4.0f;
 
     setHSL(x, y, p1.H, p1.S, avgL);
-    setHSL(x+1, y, p2.H, p2.S, avgL);
-    setHSL(x, y+1, p3.H, p3.S, avgL);
-    setHSL(x+1, y+1, p4.H, p4.S, avgL);
+    setHSL(x + 1, y, p2.H, p2.S, avgL);
+    setHSL(x, y + 1, p3.H, p3.S, avgL);
+    setHSL(x + 1, y + 1, p4.H, p4.S, avgL);
 }
 
 //p6
-void ByteRunKompresja(int wejscie[], int dlugosc, const char* nazwaPliku)
+void ByteRunKompresja(int wejscie[], int dlugosc, const char *nazwaPliku)
 {
     ofstream plik(nazwaPliku, ios::binary);
     if (!plik)
     {
-        cout<<"Blad otwarcia pliku do zapisu!"<<endl;
+        cout << "Blad otwarcia pliku do zapisu!" << endl;
         return;
     }
 
     int i = 0, skompresowanyRozmiar = 0;
     while (i < dlugosc)
     {
-        if ((i<dlugosc-1) && (wejscie[i] == wejscie[i+1]))
+        if ((i < dlugosc - 1) && (wejscie[i] == wejscie[i + 1]))
         {
-            int j=0;
-            while ((i+j<dlugosc-1) && (wejscie[i+j] == wejscie[i+1+j]) && (j<127))
+            int j = 0;
+            while ((i + j < dlugosc - 1) && (wejscie[i + j] == wejscie[i + 1 + j]) && (j < 127))
                 j++;
-            char flaga = (char)(-j);
+            char flaga = (char) (-j);
             plik.write(&flaga, 1);
-            char wartosc = (char)(wejscie[i]);
+            char wartosc = (char) (wejscie[i]);
             plik.write(&wartosc, 1);
 
-            skompresowanyRozmiar +=2;
-            i += (j+1);
-        }
-        else
+            skompresowanyRozmiar += 2;
+            i += (j + 1);
+        } else
         {
-            int j=0;
-            while ((i+j <dlugosc-1) && (wejscie[i+j] != wejscie[i+j+1]) && (j<128))
+            int j = 0;
+            while ((i + j < dlugosc - 1) && (wejscie[i + j] != wejscie[i + j + 1]) && (j < 128))
                 j++;
-            if ((i+j == dlugosc-1) && (j<128))
+            if ((i + j == dlugosc - 1) && (j < 128))
                 j++;
 
-            char flaga = (char)(j-1);
+            char flaga = (char) (j - 1);
             plik.write(&flaga, 1);
 
-            for (int k=0; k<j; k++)
+            for (int k = 0; k < j; k++)
             {
-                char wartosc = (char)(wejscie[i+k]);
+                char wartosc = (char) (wejscie[i + k]);
                 plik.write(&wartosc, 1);
             }
             skompresowanyRozmiar += (1 + j);
-            i+=j;
+            i += j;
         }
     }
     plik.close();
-    cout<<"\nByteRun Kompresja\n";
-    cout<<"Rozmiar oryginalny: "<<dlugosc<<" bajtow\n";
-    cout<<"Rozmiar skompresowany: "<<skompresowanyRozmiar<<" bajtow\n";
-    float wspolczynnik = (float)dlugosc / (float)skompresowanyRozmiar;
-    cout<<"Wspolczynnik kompresji: "<<wspolczynnik<<"\n\n";
+    cout << "\nByteRun Kompresja\n";
+    cout << "Rozmiar oryginalny: " << dlugosc << " bajtow\n";
+    cout << "Rozmiar skompresowany: " << skompresowanyRozmiar << " bajtow\n";
+    float wspolczynnik = (float) dlugosc / (float) skompresowanyRozmiar;
+    cout << "Wspolczynnik kompresji: " << wspolczynnik << "\n\n";
 }
 
-void ByteRunDekompresja(const char* nazwaPliku)
+void ByteRunDekompresja(const char *nazwaPliku)
 {
     ifstream plik(nazwaPliku, ios::binary);
     if (!plik)
     {
-        cout<<"Blad otwarcia pliku do odczytu!"<<endl;
+        cout << "Blad otwarcia pliku do odczytu!" << endl;
         return;
     }
 
-    cout<<"ByteRun Dekompresja:\n";
+    cout << "ByteRun Dekompresja:\n";
     char flaga;
     while (plik.read(&flaga, 1))
     {
@@ -750,117 +752,114 @@ void ByteRunDekompresja(const char* nazwaPliku)
             char wartosc;
             plik.read(&wartosc, 1);
             for (int i = 0; i < count; i++)
-                cout<<(int)(unsigned char)wartosc<<", ";
-        }
-        else
+                cout << (int) (unsigned char) wartosc << ", ";
+        } else
         {
             int count = flaga + 1;
             char wartosc;
             for (int i = 0; i < count; i++)
             {
                 plik.read(&wartosc, 1);
-                cout<<(int)(unsigned char)wartosc<<", ";
+                cout << (int) (unsigned char) wartosc << ", ";
             }
         }
     }
-    cout<<endl;
+    cout << endl;
     plik.close();
 }
 
-void RLEKompresja(int wejscie[], int dlugosc, const char* nazwaPliku)
+void RLEKompresja(int wejscie[], int dlugosc, const char *nazwaPliku)
 {
     ofstream plik(nazwaPliku, ios::binary);
     if (!plik)
     {
-        cout<<"Blad otwarcia pliku do zapisu!"<<endl;
+        cout << "Blad otwarcia pliku do zapisu!" << endl;
         return;
     }
 
     int i = 0, skompresowanyRozmiar = 0;
     while (i < dlugosc)
     {
-        if ((i<dlugosc-1) && (wejscie[i] == wejscie[i+1]))
+        if ((i < dlugosc - 1) && (wejscie[i] == wejscie[i + 1]))
         {
-            int j=0;
-            while ((i+j < dlugosc-1) && (wejscie[i+j] == wejscie[i+j+1]) && (j<254))
+            int j = 0;
+            while ((i + j < dlugosc - 1) && (wejscie[i + j] == wejscie[i + j + 1]) && (j < 254))
                 j++;
-            char count = (char)(j + 1);
-            char wartosc = (char)wejscie[i];
+            char count = (char) (j + 1);
+            char wartosc = (char) wejscie[i];
             plik.write(&count, 1);
             plik.write(&wartosc, 1);
             skompresowanyRozmiar += 2;
-            i+=(j+1);
-        }
-        else
+            i += (j + 1);
+        } else
         {
-            int j=0;
-            while ((i+j < dlugosc-1) && (wejscie[i+j] != wejscie[i+j+1]) && (j<254))
+            int j = 0;
+            while ((i + j < dlugosc - 1) && (wejscie[i + j] != wejscie[i + j + 1]) && (j < 254))
                 j++;
-            if ((i+j == dlugosc-1) && (j<254))
+            if ((i + j == dlugosc - 1) && (j < 254))
                 j++;
 
             char marker = 0;
-            char count = (char)j;
+            char count = (char) j;
             plik.write(&marker, 1);
             plik.write(&count, 1);
 
-            for (int k=0; k<j; k++)
+            for (int k = 0; k < j; k++)
             {
-                char wartosc = (char)wejscie[i+k];
+                char wartosc = (char) wejscie[i + k];
                 plik.write(&wartosc, 1);
             }
-            skompresowanyRozmiar += (2+j);
+            skompresowanyRozmiar += (2 + j);
 
-            if (j%2 != 0)
+            if (j % 2 != 0)
             {
                 char pad = 0;
                 plik.write(&pad, 1);
-                skompresowanyRozmiar ++;
+                skompresowanyRozmiar++;
             }
-            i+=j;
+            i += j;
         }
     }
     plik.close();
-    cout<<"\nRLE Kompresja\n";
-    cout<<"Rozmiar oryginalny: "<<dlugosc<<" bajtow\n";
-    cout<<"Rozmiar skompresowany: "<<skompresowanyRozmiar<<" bajtow\n";
-    float wspolczynnik = (float)dlugosc / (float)skompresowanyRozmiar;
-    cout<<"Wspolczynnik kompresji: "<<wspolczynnik<<"\n\n";
+    cout << "\nRLE Kompresja\n";
+    cout << "Rozmiar oryginalny: " << dlugosc << " bajtow\n";
+    cout << "Rozmiar skompresowany: " << skompresowanyRozmiar << " bajtow\n";
+    float wspolczynnik = (float) dlugosc / (float) skompresowanyRozmiar;
+    cout << "Wspolczynnik kompresji: " << wspolczynnik << "\n\n";
 }
 
-void RLEDekompresja(const char* nazwaPliku)
+void RLEDekompresja(const char *nazwaPliku)
 {
     ifstream plik(nazwaPliku, ios::binary);
     if (!plik)
     {
-        cout<<"Blad otwarcia pliku do odczytu!"<<endl;
+        cout << "Blad otwarcia pliku do odczytu!" << endl;
         return;
     }
 
-    cout<<"RLE Dekompresja:\n";
+    cout << "RLE Dekompresja:\n";
     char marker;
     while (plik.read(&marker, 1))
     {
-        unsigned char count = (unsigned char)marker;
+        unsigned char count = (unsigned char) marker;
 
         if (count > 0)
         {
             char wartosc;
             plik.read(&wartosc, 1);
             for (int i = 0; i < count; i++)
-                cout<<(int)(unsigned char)wartosc<<", ";
-        }
-        else
+                cout << (int) (unsigned char) wartosc << ", ";
+        } else
         {
             char countByte, wartosc;
-            if(!plik.read(&countByte, 1))
+            if (!plik.read(&countByte, 1))
                 break;
-            unsigned char count2 = (unsigned char)countByte;
+            unsigned char count2 = (unsigned char) countByte;
 
             for (int i = 0; i < count2; i++)
             {
                 plik.read(&wartosc, 1);
-                cout<<(int)(unsigned char)wartosc<<", ";
+                cout << (int) (unsigned char) wartosc << ", ";
             }
             if (count2 % 2 != 0)
             {
@@ -870,6 +869,227 @@ void RLEDekompresja(const char* nazwaPliku)
         }
     }
     plik.close();
+}
+
+//p7
+void LZWKompresja(int wejscie[], int dlugosc, const char *nazwaPliku)
+{
+    ofstream plik(nazwaPliku, ios::binary);
+    if (!plik)
+    {
+        cout << "Blad otwarcia pliku do zapisu!" << endl;
+        return;
+    }
+
+    LZWinicjalizacja();
+
+    slowo aktualneSlowo = noweSlowo(), slowoZnak;
+    Uint8 znak;
+    int kod, i = 0;
+
+    cout << "\nLZW Kompresja\n";
+
+    if (dlugosc > 0)
+    {
+        znak = (Uint8) wejscie[i];
+        aktualneSlowo = noweSlowo(znak);
+        aktualneSlowo.kod = znajdzWSlowniku(aktualneSlowo);
+        aktualneSlowo.wSlowniku = true;
+        i++;
+    }
+
+    while (i < dlugosc)
+    {
+        znak = (Uint8) wejscie[i];
+        slowoZnak = polaczSlowo(aktualneSlowo, znak);
+        kod = znajdzWSlowniku(slowoZnak);
+
+        if (kod >= 0)
+        {
+            aktualneSlowo = slowoZnak;
+            aktualneSlowo.kod = kod;
+            aktualneSlowo.wSlowniku = true;
+        } else
+        {
+            cout << aktualneSlowo.kod << " ";
+
+            Uint16 wartosc = aktualneSlowo.kod;
+            plik.write((char *) &wartosc, sizeof(Uint16));
+            dodajDoSlownika(slowoZnak, false);
+            aktualneSlowo = noweSlowo(znak);
+            aktualneSlowo.kod = znajdzWSlowniku(aktualneSlowo);
+            aktualneSlowo.wSlowniku = true;
+        }
+        i++;
+    }
+    if (aktualneSlowo.dlugosc > 0)
+    {
+        cout << aktualneSlowo.kod << " ";
+        Uint16 wartosc = aktualneSlowo.kod;
+        plik.write((char *) &wartosc, sizeof(Uint16));
+    }
+    plik.close();
+}
+
+void LZWinicjalizacja()
+{
+    rozmiarSlownika = 0;
+    for (int s = 0; s < 65536; s++)
+    {
+        slownik[s].kod = 0;
+        slownik[s].dlugosc = 0;
+        slownik[s].wSlowniku = false;
+        memset(slownik[s].element, 0, sizeof(slownik[s].element));
+    }
+    slowo noweSlowo;
+    for (int s = 0; s < 4; s++)
+    {
+        noweSlowo.dlugosc = 1;
+        noweSlowo.element[0] = s;
+        noweSlowo.kod = dodajDoSlownika(noweSlowo);
+    }
+}
+
+int dodajDoSlownika(slowo nowy, bool czyWyslietlac)
+{
+    if (rozmiarSlownika < 65536)
+    {
+        Uint16 nr = rozmiarSlownika;
+        slownik[nr].kod = nr;
+        slownik[nr].dlugosc = nowy.dlugosc;
+        copy(begin(nowy.element), end(nowy.element), begin(slownik[nr].element));
+        slownik[nr].wSlowniku = true;
+        if (czyWyslietlac)
+            wyswietlSlowo(slownik[nr]);
+        rozmiarSlownika++;
+        return nr;
+    }
+    return -1;
+}
+
+slowo noweSlowo()
+{
+    slowo noweSlowo;
+    noweSlowo.kod = 0;
+    noweSlowo.dlugosc = 0;
+    noweSlowo.wSlowniku = false;
+    return noweSlowo;
+}
+
+slowo noweSlowo(Uint8 znak)
+{
+    slowo noweSlowo;
+    noweSlowo.kod = 0;
+    noweSlowo.dlugosc = 1;
+    noweSlowo.element[0] = znak;
+    noweSlowo.wSlowniku = false;
+    return noweSlowo;
+}
+
+slowo polaczSlowo(slowo aktualneSlowo, Uint8 znak)
+{
+    slowo polaczoneSlowo;
+    if (aktualneSlowo.dlugosc < 4096)
+    {
+        polaczoneSlowo.kod = 0;
+        polaczoneSlowo.dlugosc = aktualneSlowo.dlugosc + 1;
+        polaczoneSlowo.wSlowniku = false;
+
+        for (int i = 0; i < aktualneSlowo.dlugosc; i++)
+            polaczoneSlowo.element[i] = aktualneSlowo.element[i];
+        polaczoneSlowo.element[aktualneSlowo.dlugosc] = znak;
+        return polaczoneSlowo;
+    } else
+    {
+        cout << "przepelnienie\n";
+        return noweSlowo(znak);
+    }
+}
+
+void wyswietlSlowo(slowo aktualneSlowo)
+{
+    if (aktualneSlowo.wSlowniku)
+        cout << "[" << aktualneSlowo.kod << "]";
+    else
+    {
+        cout << "[ ]";
+        for (int s = 0; s < aktualneSlowo.dlugosc; s++)
+        {
+            cout << (int) aktualneSlowo.element[s];
+            if (s < aktualneSlowo.dlugosc - 1)
+                cout << ", ";
+        }
+        cout << " ";
+    }
+}
+
+int znajdzWSlowniku(slowo szukany)
+{
+    for (int nr = 0; nr < rozmiarSlownika; nr++)
+        if (porownajSlowa(slownik[nr], szukany))
+            return nr;
+    return -1;
+}
+
+bool porownajSlowa(slowo slowo1, slowo slowo2)
+{
+    if (slowo1.dlugosc != slowo2.dlugosc)
+        return false;
+    for (int s = 0; s < slowo1.dlugosc; s++)
+        if (slowo1.element[s] != slowo2.element[s])
+            return false;
+    return true;
+}
+
+void LZWDekompresja(const char *nazwaPliku)
+{
+    ifstream plik(nazwaPliku, ios::binary);
+    if (!plik)
+    {
+        cout << "Blad otwarcia pliku do odczytu!" << endl;
+        return;
+    }
+
+    LZWinicjalizacja();
+
+    cout << "\nLZW Dekompresja:\n";
+    vector<Uint16> kody;
+    Uint16 odczyt;
+
+    while (plik.read((char *) &odczyt, sizeof(Uint16)))
+        kody.push_back(odczyt);
+    plik.close();
+
+    if (kody.empty())
+        return;
+
+    int staryKod = kody[0], nowyKod;
+    slowo s = slownik[staryKod];
+    for (int k = 0; k < s.dlugosc; k++)
+        cout << (int) s.element[k] << " ";
+
+    for (size_t k = 1; k < kody.size(); k++)
+    {
+        nowyKod = kody[k];
+        slowo wejsciowe;
+
+        if (nowyKod < rozmiarSlownika)
+            wejsciowe = slownik[nowyKod];
+        else
+        {
+            wejsciowe = slownik[staryKod];
+            wejsciowe = polaczSlowo(wejsciowe, wejsciowe.element[0]);
+        }
+
+        for (int j = 0; j < wejsciowe.dlugosc; j++)
+            cout << (int) wejsciowe.element[j] << " ";
+
+        slowo doDodania = slownik[staryKod];
+        doDodania = polaczSlowo(doDodania, wejsciowe.element[0]);
+        dodajDoSlownika(doDodania, false);
+        staryKod = nowyKod;
+    }
+    cout << endl;
 }
 
 /*
@@ -940,20 +1160,39 @@ void RLEDekompresja(const char* nazwaPliku)
         }
 
     //kompresja byterun
-    int nieskompresowane[] = {0, 0, 0, 0, 0, 1, 2, 3, 4, 5, 6, 7, 7, 7, 8, 8, 8, 8, 8, 8, 2, 2, 1, 3};
+    int nieskompresowane[] = {
+        0, 0, 0, 0, 0, 1, 2, 3, 4, 5, 6, 7, 7, 7, 8, 8, 8, 8, 8, 8, 2, 2, 1, 3
+    };
     int dlugosc = 24;
     cout<<"\nwejscie:\n";
-    for (int c =0; c<dlugosc-1; c++)
+    for (int c =0; c<dlugosc; c++)
         cout<<(int)nieskompresowane[c]<<", ";
-    cout<<(int)nieskompresowane[dlugosc-1]<<endl;
-    ByteRunKompresja(nieskompresowane, dlugosc);
+    cout<<endl;
+    ByteRunKompresja(nieskompresowane, dlugosc, "byterun.bin");
+    ByteRunDekompresja("byterun.bin");
 
-    //kompresja byterun
-    int nieskompresowane[] = {0, 0, 0, 0, 0, 1, 2, 3, 4, 5, 7, 7, 7, 8, 8, 8, 8, 8, 8, 2, 2, 1, 3, 1, 2};
+    //kompresja rle
+    int nieskompresowane[] = {
+        0, 0, 0, 0, 0, 1, 2, 3, 4, 5, 7, 7, 7, 8, 8, 8, 8, 8, 8, 2, 2, 1, 3, 1, 2
+    };
     int dlugosc = 25;
     cout<<"\nwejscie:\n";
-    for (int c =0; c<dlugosc-1; c++)
+    for (int c =0; c<dlugosc; c++)
         cout<<(int)nieskompresowane[c]<<", ";
-    cout<<(int)nieskompresowane[dlugosc-1]<<endl;
-    RLEKompresja(nieskompresowane, dlugosc);
+    cout<<endl;
+    RLEKompresja(nieskompresowane, dlugosc, "rle.bin");
+    RLEDekompresja("rle.bin");
+
+    //lzw
+    int nieskompresowane[] = {
+        0, 0, 0, 1, 1, 1, 1, 2, 0, 0, 3, 1,
+        3, 2, 2, 0, 0, 0, 3, 3, 3, 3, 1, 2,
+        1, 2, 3, 1, 2, 0, 0, 1, 1, 1, 3, 3
+    };
+    int dlugosc = 36;
+    for (int c=0;c<dlugosc;c++)
+        cout<<(int)nieskompresowane[c]<<", ";
+    cout<<endl;
+    LZWKompresja(nieskompresowane, dlugosc, "lzw.bin");
+    LZWDekompresja("lzw.bin");
  */

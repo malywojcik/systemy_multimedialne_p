@@ -4,4 +4,3 @@
 #include "SM2025-Funkcje.h"
 
 using namespace std;
-
