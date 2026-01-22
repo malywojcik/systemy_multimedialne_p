@@ -13,6 +13,7 @@ cmake-build-debug/
 *.lastbuildstate
 *.exe
 *.dll
+*.bin
 
 !SDL2.dll
 !lister.exe
