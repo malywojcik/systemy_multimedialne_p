@@ -4,7 +4,6 @@
 #include "SM2025-Paleta.h"
 #include "SM2025-MedianCut.h"
 #include "SM2025-Pliki.h"
-
 #include <vector>
 
 void Funkcja1()
@@ -278,7 +277,7 @@ void czyscEkran(Uint8 R, Uint8 G, Uint8 B)
     SDL_UpdateWindowSurface(window);
 }
 
-//p1
+// p1
 void setYUV(int xx, int yy, float y, float u, float v)
 {
     Uint8 R, G, B;
@@ -504,7 +503,7 @@ HSL getHSL(int xx, int yy)
     return hsl;
 }
 
-//p2
+// p2
 void setRGB555(int xx, int yy, Uint8 r, Uint8 g, Uint8 b)
 {
     Uint16 rgb555 = ((r >> 3) << 10) | ((g >> 3) << 5) | (b >> 3);
@@ -680,7 +679,7 @@ void podprobkowanieL(int xx, int yy, int x, int y)
     setHSL(x + 1, y + 1, p4.H, p4.S, avgL);
 }
 
-//p6
+// p6
 void ByteRunKompresja(int wejscie[], int dlugosc, const char *nazwaPliku)
 {
     ofstream plik(nazwaPliku, ios::binary);
@@ -871,7 +870,7 @@ void RLEDekompresja(const char *nazwaPliku)
     plik.close();
 }
 
-//p7
+// p7
 void LZWKompresja(int wejscie[], int dlugosc, const char *nazwaPliku)
 {
     ofstream plik(nazwaPliku, ios::binary);
@@ -1092,10 +1091,13 @@ void LZWDekompresja(const char *nazwaPliku)
     cout << endl;
 }
 
-/*
-    //testy
+// p8
+// implementacje
 
-    //test YCbCr
+/*
+    // testy
+
+    // test YCbCr
     for (int i=0; i<szerokosc/2; i++)
         for (int j=0; j<wysokosc/2; j++)
         {
@@ -1103,7 +1105,7 @@ void LZWDekompresja(const char *nazwaPliku)
             setYCbCr(i+szerokosc/2, j, ycbcr.Y, ycbcr.Cb, ycbcr.Cr);
         }
 
-    //test hsl
+    // test hsl
     for (int i=0; i<szerokosc/2; i++)
         for (int j=0; j<wysokosc/2; j++)
         {
@@ -1111,7 +1113,7 @@ void LZWDekompresja(const char *nazwaPliku)
             setHSL(i, j+wysokosc/2, hsl.H, hsl.S, hsl.L);
         }
 
-    //test yuv i yiq
+    // test yuv i yiq
     for (int i=0; i<szerokosc/2; i++)
         for (int j=0; j<wysokosc/2; j++)
         {
@@ -1121,7 +1123,7 @@ void LZWDekompresja(const char *nazwaPliku)
             setYIQ(i+szerokosc/2, j+wysokosc/2, yiq.Y, yiq.I, yiq.Q);
         }
 
-    //test rgb555
+    // test rgb555
     for (int i=0; i<szerokosc/2; i++)
         for (int j=0; j<wysokosc/2; j++)
         {
@@ -1131,7 +1133,7 @@ void LZWDekompresja(const char *nazwaPliku)
             setRGB555(i+szerokosc/2, j+wysokosc/2, rgb555_);
         }
 
-    //test rgb565
+    // test rgb565
     for (int i=0; i<szerokosc/2; i++)
         for (int j=0; j<wysokosc/2; j++)
         {
@@ -1141,7 +1143,7 @@ void LZWDekompresja(const char *nazwaPliku)
             setRGB565(i+szerokosc/2, j+wysokosc/2, rgb565_);
         }
 
-    //podprobkowanie yuv, yiq, ycbcr
+    // podprobkowanie yuv, yiq, ycbcr
     for (int i=0; i<szerokosc; i+=2)
         for (int j=0; j<wysokosc; j+=2)
         {
@@ -1150,7 +1152,7 @@ void LZWDekompresja(const char *nazwaPliku)
             podprobkowanieYCbCr(i, j, i+szerokosc/2, j+wysokosc/2);
         }
 
-    //podprobkowanie hsl
+    // podprobkowanie hsl
     for (int i=0; i<szerokosc; i+=2)
         for (int j=0; j<wysokosc; j+=2)
         {
@@ -1159,7 +1161,7 @@ void LZWDekompresja(const char *nazwaPliku)
             podprobkowanieL(i, j, i+szerokosc/2, j+wysokosc/2);
         }
 
-    //kompresja byterun
+    // kompresja byterun
     int nieskompresowane[] = {
         0, 0, 0, 0, 0, 1, 2, 3, 4, 5, 6, 7, 7, 7, 8, 8, 8, 8, 8, 8, 2, 2, 1, 3
     };
@@ -1171,7 +1173,7 @@ void LZWDekompresja(const char *nazwaPliku)
     ByteRunKompresja(nieskompresowane, dlugosc, "byterun.bin");
     ByteRunDekompresja("byterun.bin");
 
-    //kompresja rle
+    // kompresja rle
     int nieskompresowane[] = {
         0, 0, 0, 0, 0, 1, 2, 3, 4, 5, 7, 7, 7, 8, 8, 8, 8, 8, 8, 2, 2, 1, 3, 1, 2
     };
@@ -1183,7 +1185,7 @@ void LZWDekompresja(const char *nazwaPliku)
     RLEKompresja(nieskompresowane, dlugosc, "rle.bin");
     RLEDekompresja("rle.bin");
 
-    //lzw
+    // lzw
     int nieskompresowane[] = {
         0, 0, 0, 1, 1, 1, 1, 2, 0, 0, 3, 1,
         3, 2, 2, 0, 0, 0, 3, 3, 3, 3, 1, 2,

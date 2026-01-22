@@ -33,7 +33,7 @@ void czyscEkran(Uint8 R, Uint8 G, Uint8 B);
 
 void ladujBMP(char const *nazwa, int x, int y);
 
-//p1
+// p1
 void setYUV(int xx, int yy, float y, float u, float v);
 
 YUV getYUV(int xx, int yy);
@@ -50,7 +50,7 @@ void setHSL(int xx, int yy, float h, float s, float l);
 
 HSL getHSL(int xx, int yy);
 
-//p2
+// p2
 void setRGB555(int xx, int yy, Uint8 r, Uint8 g, Uint8 b);
 
 void setRGB555(int xx, int yy, Uint16 rgb555);
@@ -79,7 +79,7 @@ void podprobkowanieS(int xx, int yy, int x, int y);
 
 void podprobkowanieL(int xx, int yy, int x, int y);
 
-//p6
+// p6
 void ByteRunKompresja(int wejscie[], int dlugosc, const char *nazwaPliku);
 
 void ByteRunDekompresja(const char *nazwaPliku);
@@ -88,7 +88,7 @@ void RLEKompresja(int wejscie[], int dlugosc, const char *nazwaPliku);
 
 void RLEDekompresja(const char *nazwaPliku);
 
-//p7
+// p7
 void LZWKompresja(int wejscie[], int dlugosc, const char *nazwaPliku);
 
 void LZWinicjalizacja();
@@ -108,5 +108,8 @@ int znajdzWSlowniku(slowo szukany);
 bool porownajSlowa(slowo slowo1, slowo slowo2);
 
 void LZWDekompresja(const char *nazwaPliku);
+
+// p8
+// deklaracje
 
 #endif // SM2025_FUNKCJE_H_INCLUDED

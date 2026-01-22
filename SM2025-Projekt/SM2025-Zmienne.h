@@ -18,7 +18,7 @@ extern int ileKolorow;
 extern SDL_Color paleta8k[256];
 extern SDL_Color paleta8s[256];
 
-//p1
+// p1
 struct YUV
 {
     float Y;
@@ -54,7 +54,7 @@ struct RGB
     Uint8 B;
 };
 
-//p7
+// p7
 struct slowo
 {
     Uint16 kod = 0;
