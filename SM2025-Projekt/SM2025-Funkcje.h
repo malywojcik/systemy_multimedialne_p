@@ -110,6 +110,15 @@ bool porownajSlowa(slowo slowo1, slowo slowo2);
 void LZWDekompresja(const char *nazwaPliku);
 
 // p8
-// deklaracje
+Uint8 predyktorPaeth(Uint8 a, Uint8 b, Uint8 c);
+void filtrSub(Uint8 *wejscie, Uint8 *wyjscie, int szer, int wys, int bpp);
+void filtrUp(Uint8 *wejscie, Uint8 *wyjscie, int szer, int wys, int bpp);
+void filtrAvg(Uint8 *wejscie, Uint8 *wyjscie, int szer, int wys, int bpp);
+void filtrPaeth(Uint8 *wejscie, Uint8 *wyjscie, int szer, int wys, int bpp);
+
+void defiltrSub(Uint8 *wejscie, Uint8 *wyjscie, int szer, int wys, int bpp);
+void defiltrUp(Uint8 *wejscie, Uint8 *wyjscie, int szer, int wys, int bpp);
+void defiltrAvg(Uint8 *wejscie, Uint8 *wyjscie, int szer, int wys, int bpp);
+void defiltrPaeth(Uint8 *wejscie, Uint8 *wyjscie, int szer, int wys, int bpp);
 
 #endif // SM2025_FUNKCJE_H_INCLUDED
