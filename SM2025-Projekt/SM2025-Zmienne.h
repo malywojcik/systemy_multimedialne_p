@@ -18,6 +18,17 @@ extern int ileKolorow;
 extern SDL_Color paleta8k[256];
 extern SDL_Color paleta8s[256];
 
+//gk
+void paletaNarzucona5bitDithering();
+void paletaSzara5bitDithering();
+
+extern SDL_Color paleta5k[32];
+extern SDL_Color paleta5s[32];
+
+extern int ileKubelkow;
+extern Uint8 obrazekS[320 * 200];
+extern SDL_Color obrazekK[320 * 200];
+
 // p1
 struct YUV
 {

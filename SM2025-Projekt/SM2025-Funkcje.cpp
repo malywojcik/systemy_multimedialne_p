@@ -8,19 +8,7 @@
 
 void Funkcja1()
 {
-    //lzw
-    int nieskompresowane[] = {
-        0, 0, 0, 1, 1, 1, 1, 2, 0, 0, 3, 1,
-        3, 2, 2, 0, 0, 0, 3, 3, 3, 3, 1, 2,
-        1, 2, 3, 1, 2, 0, 0, 1, 1, 1, 3, 3
-    };
-    int dlugosc = 36;
-    for (int c = 0; c < dlugosc; c++)
-        cout << (int) nieskompresowane[c] << ", ";
-    cout << endl;
-
-    LZWKompresja(nieskompresowane, dlugosc, "lzw.bin");
-    LZWDekompresja("lzw.bin");
+    //...
 
     SDL_UpdateWindowSurface(window);
 }
@@ -1323,4 +1311,5 @@ void defiltrPaeth(Uint8 *wejscie, Uint8 *wyjscie, int szer, int wys, int bpp)
     cout<<endl;
     LZWKompresja(nieskompresowane, dlugosc, "lzw.bin");
     LZWDekompresja("lzw.bin");
+
  */
