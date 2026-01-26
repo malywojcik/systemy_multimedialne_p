@@ -7,7 +7,7 @@
 #define szerokosc 640
 #define wysokosc 400
 
-#define tytul "SM2025 - Projekt - Zespol XX"
+#define tytul "SM2025 - Projekt - Zespol 33"
 
 extern SDL_Window *window;
 extern SDL_Surface *screen;
@@ -17,17 +17,6 @@ extern int ileKolorow;
 
 extern SDL_Color paleta8k[256];
 extern SDL_Color paleta8s[256];
-
-//gk
-void paletaNarzucona5bitDithering();
-void paletaSzara5bitDithering();
-
-extern SDL_Color paleta5k[32];
-extern SDL_Color paleta5s[32];
-
-extern int ileKubelkow;
-extern Uint8 obrazekS[320 * 200];
-extern SDL_Color obrazekK[320 * 200];
 
 // p1
 struct YUV
@@ -76,5 +65,19 @@ struct slowo
 
 extern int rozmiarSlownika;
 extern slowo slownik[65535];
+
+// final
+struct naglowekObrazu
+{
+    Uint16 identyfikator;
+    Uint16 szer;
+    Uint16 wyso;
+    Uint8  glebiaBitowa;    // 16 lub 24
+    Uint8  modelBarwny;     // 0 = RGB, 1 = YCbCr (dla trybu 24-bit), inna wartość dla 16-bit
+    Uint8  kompresja;       // 0 = brak, 1 = ByteRun, 2 = RLE, 3 = LZW
+    Uint8  predykcja;       // 0 = brak, 1-4 = typy filtrów PNG
+    Uint8  dithering;       // 0 = nie, 1 = tak
+    Uint8  zarezerwowane;
+};
 
 #endif // SM2025_ZMIENNE_H_INCLUDED

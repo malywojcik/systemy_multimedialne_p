@@ -11,12 +11,8 @@ link_directories(SDL2/lib)
 add_executable(SM2025_Projekt
         SM2025-Funkcje.cpp
         SM2025-Funkcje.h
-        SM2025-MedianCut.cpp
-        SM2025-MedianCut.h
         SM2025-Paleta.cpp
         SM2025-Paleta.h
-        SM2025-Pliki.cpp
-        SM2025-Pliki.h
         SM2025-Projekt.cpp
         SM2025-Zmienne.cpp
         SM2025-Zmienne.h)

@@ -2,72 +2,8 @@
 #include "SM2025-Funkcje.h"
 #include "SM2025-Zmienne.h"
 #include "SM2025-Paleta.h"
-#include "SM2025-MedianCut.h"
-#include "SM2025-Pliki.h"
 #include <vector>
-
-void Funkcja1()
-{
-    //...
-
-    SDL_UpdateWindowSurface(window);
-}
-
-void Funkcja2()
-{
-    //...
-
-    SDL_UpdateWindowSurface(window);
-}
-
-void Funkcja3()
-{
-    //...
-
-    SDL_UpdateWindowSurface(window);
-}
-
-void Funkcja4()
-{
-    //...
-
-    SDL_UpdateWindowSurface(window);
-}
-
-void Funkcja5()
-{
-    //...
-
-    SDL_UpdateWindowSurface(window);
-}
-
-void Funkcja6()
-{
-    //...
-
-    SDL_UpdateWindowSurface(window);
-}
-
-void Funkcja7()
-{
-    //...
-
-    SDL_UpdateWindowSurface(window);
-}
-
-void Funkcja8()
-{
-    //...
-
-    SDL_UpdateWindowSurface(window);
-}
-
-void Funkcja9()
-{
-    //...
-
-    SDL_UpdateWindowSurface(window);
-}
+#include <fstream>
 
 void setPixel(int x, int y, Uint8 R, Uint8 G, Uint8 B)
 {
@@ -264,9 +200,6 @@ void czyscEkran(Uint8 R, Uint8 G, Uint8 B)
     SDL_FillRect(screen, 0, SDL_MapRGB(screen->format, R, G, B));
     SDL_UpdateWindowSurface(window);
 }
-
-//gk
-//rzeczy z gk
 
 // p1
 void setYUV(int xx, int yy, float y, float u, float v)
@@ -511,22 +444,6 @@ void setRGB555(int xx, int yy, Uint16 rgb555)
     setPixel(xx, yy, r, g, b);
 }
 
-void setRGB565(int xx, int yy, Uint8 r, Uint8 g, Uint8 b)
-{
-    Uint16 rgb565 = ((r >> 3) << 11) | ((g >> 2) << 5) | (b >> 3);
-
-    setRGB565(xx, yy, rgb565);
-}
-
-void setRGB565(int xx, int yy, Uint16 rgb565)
-{
-    Uint8 r = ((rgb565 >> 11) & 0x1F) << 3;
-    Uint8 g = ((rgb565 >> 5) & 0x3F) << 2;
-    Uint8 b = (rgb565 & 0x1F) << 3;
-
-    setPixel(xx, yy, r, g, b);
-}
-
 SDL_Color getRGB555(int xx, int yy)
 {
     Uint16 data = getRGB555_(xx, yy);
@@ -544,6 +461,22 @@ Uint16 getRGB555_(int xx, int yy)
     SDL_Color kolor = getPixel(xx, yy);
 
     return ((kolor.r >> 3) << 10 | ((kolor.g >> 3) << 5) | (kolor.b >> 3));
+}
+
+void setRGB565(int xx, int yy, Uint8 r, Uint8 g, Uint8 b)
+{
+    Uint16 rgb565 = ((r >> 3) << 11) | ((g >> 2) << 5) | (b >> 3);
+
+    setRGB565(xx, yy, rgb565);
+}
+
+void setRGB565(int xx, int yy, Uint16 rgb565)
+{
+    Uint8 r = ((rgb565 >> 11) & 0x1F) << 3;
+    Uint8 g = ((rgb565 >> 5) & 0x3F) << 2;
+    Uint8 b = (rgb565 & 0x1F) << 3;
+
+    setPixel(xx, yy, r, g, b);
 }
 
 SDL_Color getRGB565(int xx, int yy)
@@ -671,16 +604,10 @@ void podprobkowanieL(int xx, int yy, int x, int y)
 }
 
 // p6
-void ByteRunKompresja(int wejscie[], int dlugosc, const char *nazwaPliku)
+vector<Uint8> ByteRunKompresja(const vector<Uint8> *wejscie)
 {
-    ofstream plik(nazwaPliku, ios::binary);
-    if (!plik)
-    {
-        cout << "Blad otwarcia pliku do zapisu!" << endl;
-        return;
-    }
-
-    int i = 0, skompresowanyRozmiar = 0;
+    vector<Uint8> wyjscie;
+    int i = 0, dlugosc = wejscie.size();
     while (i < dlugosc)
     {
         if ((i < dlugosc - 1) && (wejscie[i] == wejscie[i + 1]))
@@ -688,39 +615,24 @@ void ByteRunKompresja(int wejscie[], int dlugosc, const char *nazwaPliku)
             int j = 0;
             while ((i + j < dlugosc - 1) && (wejscie[i + j] == wejscie[i + 1 + j]) && (j < 127))
                 j++;
-            char flaga = (char) (-j);
-            plik.write(&flaga, 1);
-            char wartosc = (char) (wejscie[i]);
-            plik.write(&wartosc, 1);
 
-            skompresowanyRozmiar += 2;
+            wyjscie.push_back((Uint8)(-(j)));
+            wyjscie.push_back((Uint8)(-j));
+            wyjscie.push_back(wejscie[i]);
             i += (j + 1);
-        } else
+        }
+        else
         {
             int j = 0;
-            while ((i + j < dlugosc - 1) && (wejscie[i + j] != wejscie[i + j + 1]) && (j < 128))
+            while ((i + j < dlugosc - 1) && (wejscie[i + j] != wejscie[i + j + 1]) && (j < 127))
                 j++;
-            if ((i + j == dlugosc - 1) && (j < 128))
-                j++;
-
-            char flaga = (char) (j - 1);
-            plik.write(&flaga, 1);
-
-            for (int k = 0; k < j; k++)
-            {
-                char wartosc = (char) (wejscie[i + k]);
-                plik.write(&wartosc, 1);
-            }
-            skompresowanyRozmiar += (1 + j);
-            i += j;
+            wyjscie.push_back((Uint8)(j));
+            for (int k=0; k < j; k++)
+                wyjscie.push_back(wejscie[i + k]);
+            i += (j +1);
         }
     }
-    plik.close();
-    cout << "\nByteRun Kompresja\n";
-    cout << "Rozmiar oryginalny: " << dlugosc << " bajtow\n";
-    cout << "Rozmiar skompresowany: " << skompresowanyRozmiar << " bajtow\n";
-    float wspolczynnik = (float) dlugosc / (float) skompresowanyRozmiar;
-    cout << "Wspolczynnik kompresji: " << wspolczynnik << "\n\n";
+    return wyjscie;
 }
 
 void ByteRunDekompresja(const char *nazwaPliku)
@@ -758,16 +670,10 @@ void ByteRunDekompresja(const char *nazwaPliku)
     plik.close();
 }
 
-void RLEKompresja(int wejscie[], int dlugosc, const char *nazwaPliku)
+vector<Uint8> RLEKompresja(const vector<Uint8> *wejscie)
 {
-    ofstream plik(nazwaPliku, ios::binary);
-    if (!plik)
-    {
-        cout << "Blad otwarcia pliku do zapisu!" << endl;
-        return;
-    }
-
-    int i = 0, skompresowanyRozmiar = 0;
+    vector<Uint8> wyjscie;
+    int i = 0, dlugosc = wejscie.size();
     while (i < dlugosc)
     {
         if ((i < dlugosc - 1) && (wejscie[i] == wejscie[i + 1]))
@@ -775,47 +681,28 @@ void RLEKompresja(int wejscie[], int dlugosc, const char *nazwaPliku)
             int j = 0;
             while ((i + j < dlugosc - 1) && (wejscie[i + j] == wejscie[i + j + 1]) && (j < 254))
                 j++;
-            char count = (char) (j + 1);
-            char wartosc = (char) wejscie[i];
-            plik.write(&count, 1);
-            plik.write(&wartosc, 1);
-            skompresowanyRozmiar += 2;
+            wyjscie.push_back((Uint8)(j + 1));
+            wyjscie.push_back(wejscie[i]);
             i += (j + 1);
-        } else
+        }
+        else
         {
             int j = 0;
             while ((i + j < dlugosc - 1) && (wejscie[i + j] != wejscie[i + j + 1]) && (j < 254))
                 j++;
             if ((i + j == dlugosc - 1) && (j < 254))
                 j++;
-
-            char marker = 0;
-            char count = (char) j;
-            plik.write(&marker, 1);
-            plik.write(&count, 1);
-
-            for (int k = 0; k < j; k++)
-            {
-                char wartosc = (char) wejscie[i + k];
-                plik.write(&wartosc, 1);
-            }
-            skompresowanyRozmiar += (2 + j);
-
-            if (j % 2 != 0)
-            {
-                char pad = 0;
-                plik.write(&pad, 1);
-                skompresowanyRozmiar++;
-            }
-            i += j;
+            int count = j +1;
+            wyjscie.push_back(0);
+            wyjscie.push_back(count);
+            for (int k=0; k < count; k++)
+                wyjscie.push_back(wejscie[i+k]);
+            if (count % 2 != 0)
+                wyjscie.push_back(0);
+            i += count;
         }
     }
-    plik.close();
-    cout << "\nRLE Kompresja\n";
-    cout << "Rozmiar oryginalny: " << dlugosc << " bajtow\n";
-    cout << "Rozmiar skompresowany: " << skompresowanyRozmiar << " bajtow\n";
-    float wspolczynnik = (float) dlugosc / (float) skompresowanyRozmiar;
-    cout << "Wspolczynnik kompresji: " << wspolczynnik << "\n\n";
+    return wyjscie;
 }
 
 void RLEDekompresja(const char *nazwaPliku)
@@ -862,36 +749,25 @@ void RLEDekompresja(const char *nazwaPliku)
 }
 
 // p7
-void LZWKompresja(int wejscie[], int dlugosc, const char *nazwaPliku)
+vector<Uint8> LZWKompresja(const vector<Uint8> *wejscie)
 {
-    ofstream plik(nazwaPliku, ios::binary);
-    if (!plik)
-    {
-        cout << "Blad otwarcia pliku do zapisu!" << endl;
-        return;
-    }
+    vector<Uint8> wyjscie;
+    int i = 0, dlugosc = wejscie.size(), kod;
 
     LZWinicjalizacja();
-
-    slowo aktualneSlowo = noweSlowo(), slowoZnak;
-    Uint8 znak;
-    int kod, i = 0;
-
-    cout << "\nLZW Kompresja\n";
+    slowo aktualneSlowo = noweSlowo();
 
     if (dlugosc > 0)
     {
-        znak = (Uint8) wejscie[i];
-        aktualneSlowo = noweSlowo(znak);
+        aktualneSlowo = noweSlowo(wejscie[i++]);
         aktualneSlowo.kod = znajdzWSlowniku(aktualneSlowo);
         aktualneSlowo.wSlowniku = true;
-        i++;
     }
 
     while (i < dlugosc)
     {
-        znak = (Uint8) wejscie[i];
-        slowoZnak = polaczSlowo(aktualneSlowo, znak);
+        Uint8 znak = wejscie[i];
+        slowo slowoZnak = polaczSlowo(aktualneSlowo, znak);
         kod = znajdzWSlowniku(slowoZnak);
 
         if (kod >= 0)
@@ -899,12 +775,13 @@ void LZWKompresja(int wejscie[], int dlugosc, const char *nazwaPliku)
             aktualneSlowo = slowoZnak;
             aktualneSlowo.kod = kod;
             aktualneSlowo.wSlowniku = true;
-        } else
+        }
+        else
         {
-            cout << aktualneSlowo.kod << " ";
-
             Uint16 wartosc = aktualneSlowo.kod;
-            plik.write((char *) &wartosc, sizeof(Uint16));
+            wyjscie.push_back(wartosc & 0xFF);
+            wyjscie.push_back(wartosc >> 8) & 0xFF;
+
             dodajDoSlownika(slowoZnak, false);
             aktualneSlowo = noweSlowo(znak);
             aktualneSlowo.kod = znajdzWSlowniku(aktualneSlowo);
@@ -912,13 +789,62 @@ void LZWKompresja(int wejscie[], int dlugosc, const char *nazwaPliku)
         }
         i++;
     }
-    if (aktualneSlowo.dlugosc > 0)
+    Uint16 wartosc = aktualneSlowo.kod;
+    wyjscie.push_back(wartosc & 0xFF);
+    wyjscie.push_back((wartosc >> 8) & 0xFF);
+
+    return wyjscie;
+}
+
+void LZWDekompresja(const char *nazwaPliku)
+{
+    ifstream plik(nazwaPliku, ios::binary);
+    if (!plik)
     {
-        cout << aktualneSlowo.kod << " ";
-        Uint16 wartosc = aktualneSlowo.kod;
-        plik.write((char *) &wartosc, sizeof(Uint16));
+        cout << "Blad otwarcia pliku do odczytu!" << endl;
+        return;
     }
+
+    LZWinicjalizacja();
+
+    cout << "\nLZW Dekompresja:\n";
+    vector<Uint16> kody;
+    Uint16 odczyt;
+
+    while (plik.read((char *) &odczyt, sizeof(Uint16)))
+        kody.push_back(odczyt);
     plik.close();
+
+    if (kody.empty())
+        return;
+
+    int staryKod = kody[0], nowyKod;
+    slowo s = slownik[staryKod];
+    for (int k = 0; k < s.dlugosc; k++)
+        cout << (int) s.element[k] << " ";
+
+    for (size_t k = 1; k < kody.size(); k++)
+    {
+        nowyKod = kody[k];
+        slowo wejsciowe;
+
+        if (nowyKod < rozmiarSlownika)
+            wejsciowe = slownik[nowyKod];
+        else
+        {
+            wejsciowe = slownik[staryKod];
+            wejsciowe = polaczSlowo(wejsciowe, wejsciowe.element[0]);
+        }
+
+        for (int j = 0; j < wejsciowe.dlugosc; j++)
+            cout << (int) wejsciowe.element[j] << " ";
+
+        slowo doDodania = slownik[staryKod];
+        doDodania = polaczSlowo(doDodania, wejsciowe.element[0]);
+        dodajDoSlownika(doDodania, false);
+        staryKod = nowyKod;
+    }
+    cout << endl;
 }
 
 void LZWinicjalizacja()
@@ -1029,57 +955,6 @@ bool porownajSlowa(slowo slowo1, slowo slowo2)
         if (slowo1.element[s] != slowo2.element[s])
             return false;
     return true;
-}
-
-void LZWDekompresja(const char *nazwaPliku)
-{
-    ifstream plik(nazwaPliku, ios::binary);
-    if (!plik)
-    {
-        cout << "Blad otwarcia pliku do odczytu!" << endl;
-        return;
-    }
-
-    LZWinicjalizacja();
-
-    cout << "\nLZW Dekompresja:\n";
-    vector<Uint16> kody;
-    Uint16 odczyt;
-
-    while (plik.read((char *) &odczyt, sizeof(Uint16)))
-        kody.push_back(odczyt);
-    plik.close();
-
-    if (kody.empty())
-        return;
-
-    int staryKod = kody[0], nowyKod;
-    slowo s = slownik[staryKod];
-    for (int k = 0; k < s.dlugosc; k++)
-        cout << (int) s.element[k] << " ";
-
-    for (size_t k = 1; k < kody.size(); k++)
-    {
-        nowyKod = kody[k];
-        slowo wejsciowe;
-
-        if (nowyKod < rozmiarSlownika)
-            wejsciowe = slownik[nowyKod];
-        else
-        {
-            wejsciowe = slownik[staryKod];
-            wejsciowe = polaczSlowo(wejsciowe, wejsciowe.element[0]);
-        }
-
-        for (int j = 0; j < wejsciowe.dlugosc; j++)
-            cout << (int) wejsciowe.element[j] << " ";
-
-        slowo doDodania = slownik[staryKod];
-        doDodania = polaczSlowo(doDodania, wejsciowe.element[0]);
-        dodajDoSlownika(doDodania, false);
-        staryKod = nowyKod;
-    }
-    cout << endl;
 }
 
 // p8
@@ -1208,108 +1083,65 @@ void defiltrPaeth(Uint8 *wejscie, Uint8 *wyjscie, int szer, int wys, int bpp)
         }
 }
 
-/*
-    // testy
-
-    // test YCbCr
-    for (int i=0; i<szerokosc/2; i++)
-        for (int j=0; j<wysokosc/2; j++)
+// final
+void zapiszZ33(const char *nazwa, const naglowekObrazu &opcje)
+{
+    vector<Uint8> dane;
+    for (int y =0; y<wysokosc; y++)
+        for (int x=0;x<szerokosc; x++)
         {
-            YCbCr ycbcr = getYCbCr(i, j);
-            setYCbCr(i+szerokosc/2, j, ycbcr.Y, ycbcr.Cb, ycbcr.Cr);
+            SDL_Color k = getPixel(x, y);
+            if (opcje.glebiaBitowa == 16)
+            {
+                Uint16 px = ((k.r >> 3) << 11) | ((k.g >> 2) << 5) | (k.b >> 3);
+                dane.push_back(px & 0xFF);
+                dane.push_back((px >> 8) & 0xFF);
+            }
+            else
+            {
+                if (opcje.modelBarwny == 1) // YCbCr
+                {
+                    YCbCr ycbcr = getYCbCr(x, y);
+                    dane.push_back((Uint8)ycbcr.Y);
+                    dane.push_back((Uint8)ycbcr.Cb);
+                    dane.push_back((Uint8)ycbcr.Cr);
+                }
+                else
+                {
+                    dane.push_back(k.r);
+                    dane.push_back(k.g);
+                    dane.push_back(k.b);
+                }
+            }
         }
 
-    // test hsl
-    for (int i=0; i<szerokosc/2; i++)
-        for (int j=0; j<wysokosc/2; j++)
-        {
-            HSL hsl = getHSL(i, j);
-            setHSL(i, j+wysokosc/2, hsl.H, hsl.S, hsl.L);
-        }
+    vector<Uint8> danePredykcja = dane;
+    if (opcje.predykcja > 0)
+    {
+        danePredykcja.assign(dane.size(), 0);
+        int bpp = (opcje.glebiaBitowa == 16) ? 2 : 3;
+        filtrPaeth(dane.data(), danePredykcja.data(), szerokosc, wysokosc, bpp);
+    }
 
-    // test yuv i yiq
-    for (int i=0; i<szerokosc/2; i++)
-        for (int j=0; j<wysokosc/2; j++)
-        {
-            YUV yuv = getYUV(i, j);
-            YIQ yiq = getYIQ(i, j);
-            setYUV(i+szerokosc/2, j, yuv.Y, yuv.U, yuv.V);
-            setYIQ(i+szerokosc/2, j+wysokosc/2, yiq.Y, yiq.I, yiq.Q);
-        }
+    vector<Uint8> daneKompresja;
+    if (opcje.kompresja == 1)
+        daneKompresja = ByteRunKompresja(danePredykcja);
+    else if (opcje.kompresja == 2)
+        daneKompresja = RLEKompresja(danePredykcja);
+    else if (opcje.kompresja == 3)
+        daneKompresja = LZWKompresja(danePredykcja);
+    else
+        daneKompresja = danePredykcja;
 
-    // test rgb555
-    for (int i=0; i<szerokosc/2; i++)
-        for (int j=0; j<wysokosc/2; j++)
-        {
-            SDL_Color rgb555 = getRGB555(i, j);
-            Uint16 rgb555_ = getRGB555_(i, j);
-            setRGB555(i+szerokosc/2, j, rgb555.r, rgb555.g, rgb555.b);
-            setRGB555(i+szerokosc/2, j+wysokosc/2, rgb555_);
-        }
+    ofstream plik(nazwa, ios::binary);
+    plik.write((char*)&opcje, sizeof(naglowekObrazu));
+    plik.write((char*)daneKompresja.data(), daneKompresja.size());
+    plik.close();
 
-    // test rgb565
-    for (int i=0; i<szerokosc/2; i++)
-        for (int j=0; j<wysokosc/2; j++)
-        {
-            SDL_Color rgb565 = getRGB565(i, j);
-            Uint16 rgb565_ = getRGB565_(i, j);
-            setRGB565(i+szerokosc/2, j, rgb565.r, rgb565.g, rgb565.b);
-            setRGB565(i+szerokosc/2, j+wysokosc/2, rgb565_);
-        }
+    cout<<"Zapisano obraz do pliku: (" << nazwa << ") rozmiar: "<<daneKompresja.size()<<" bajtow"<<endl;
+}
 
-    // podprobkowanie yuv, yiq, ycbcr
-    for (int i=0; i<szerokosc; i+=2)
-        for (int j=0; j<wysokosc; j+=2)
-        {
-            podprobkowanieYUV(i, j, i+szerokosc/2, j);
-            podprobkowanieYIQ(i, j, i, j+wysokosc/2);
-            podprobkowanieYCbCr(i, j, i+szerokosc/2, j+wysokosc/2);
-        }
-
-    // podprobkowanie hsl
-    for (int i=0; i<szerokosc; i+=2)
-        for (int j=0; j<wysokosc; j+=2)
-        {
-            podprobkowanieH(i, j, i+szerokosc/2, j);
-            podprobkowanieS(i, j, i, j+wysokosc/2);
-            podprobkowanieL(i, j, i+szerokosc/2, j+wysokosc/2);
-        }
-
-    // kompresja byterun
-    int nieskompresowane[] = {
-        0, 0, 0, 0, 0, 1, 2, 3, 4, 5, 6, 7, 7, 7, 8, 8, 8, 8, 8, 8, 2, 2, 1, 3
-    };
-    int dlugosc = 24;
-    cout<<"\nwejscie:\n";
-    for (int c =0; c<dlugosc; c++)
-        cout<<(int)nieskompresowane[c]<<", ";
-    cout<<endl;
-    ByteRunKompresja(nieskompresowane, dlugosc, "byterun.bin");
-    ByteRunDekompresja("byterun.bin");
-
-    // kompresja rle
-    int nieskompresowane[] = {
-        0, 0, 0, 0, 0, 1, 2, 3, 4, 5, 7, 7, 7, 8, 8, 8, 8, 8, 8, 2, 2, 1, 3, 1, 2
-    };
-    int dlugosc = 25;
-    cout<<"\nwejscie:\n";
-    for (int c =0; c<dlugosc; c++)
-        cout<<(int)nieskompresowane[c]<<", ";
-    cout<<endl;
-    RLEKompresja(nieskompresowane, dlugosc, "rle.bin");
-    RLEDekompresja("rle.bin");
-
-    // lzw
-    int nieskompresowane[] = {
-        0, 0, 0, 1, 1, 1, 1, 2, 0, 0, 3, 1,
-        3, 2, 2, 0, 0, 0, 3, 3, 3, 3, 1, 2,
-        1, 2, 3, 1, 2, 0, 0, 1, 1, 1, 3, 3
-    };
-    int dlugosc = 36;
-    for (int c=0;c<dlugosc;c++)
-        cout<<(int)nieskompresowane[c]<<", ";
-    cout<<endl;
-    LZWKompresja(nieskompresowane, dlugosc, "lzw.bin");
-    LZWDekompresja("lzw.bin");
-
- */
+void wczytajZ33(const char *nazwa)
+{
+    //asd
+}

@@ -6,31 +6,23 @@
 #include <math.h>
 #include <SDL2/SDL.h>
 #include "SM2025-Zmienne.h"
+#include <vector>
+
+using namespace std;
 
 void Funkcja1();
-
 void Funkcja2();
-
 void Funkcja3();
-
 void Funkcja4();
-
 void Funkcja5();
-
 void Funkcja6();
-
 void Funkcja7();
-
 void Funkcja8();
-
 void Funkcja9();
 
 void setPixel(int x, int y, Uint8 R, Uint8 G, Uint8 B);
-
 SDL_Color getPixel(int x, int y);
-
 void czyscEkran(Uint8 R, Uint8 G, Uint8 B);
-
 void ladujBMP(char const *nazwa, int x, int y);
 
 // p1
@@ -58,9 +50,7 @@ SDL_Color getRGB565(int xx, int yy);
 Uint16 getRGB565_(int xx, int yy);
 
 void podprobkowanieYUV(int xx, int yy, int x, int y);
-
 void podprobkowanieYIQ(int xx, int yy, int x, int y);
-
 void podprobkowanieYCbCr(int xx, int yy, int x, int y);
 
 void podprobkowanieH(int xx, int yy, int x, int y);
@@ -68,14 +58,14 @@ void podprobkowanieS(int xx, int yy, int x, int y);
 void podprobkowanieL(int xx, int yy, int x, int y);
 
 // p6
-void ByteRunKompresja(int wejscie[], int dlugosc, const char *nazwaPliku);
+vector<Uint8> ByteRunKompresja(Uint8 *wejscie);
 void ByteRunDekompresja(const char *nazwaPliku);
 
-void RLEKompresja(int wejscie[], int dlugosc, const char *nazwaPliku);
+vector<Uint8> RLEKompresja(Uint8 *wejscie);
 void RLEDekompresja(const char *nazwaPliku);
 
 // p7
-void LZWKompresja(int wejscie[], int dlugosc, const char *nazwaPliku);
+vector<Uint8> LZWKompresja(Uint8 *wejscie);
 void LZWDekompresja(const char *nazwaPliku);
 void LZWinicjalizacja();
 
@@ -99,5 +89,9 @@ void defiltrSub(Uint8 *wejscie, Uint8 *wyjscie, int szer, int wys, int bpp);
 void defiltrUp(Uint8 *wejscie, Uint8 *wyjscie, int szer, int wys, int bpp);
 void defiltrAvg(Uint8 *wejscie, Uint8 *wyjscie, int szer, int wys, int bpp);
 void defiltrPaeth(Uint8 *wejscie, Uint8 *wyjscie, int szer, int wys, int bpp);
+
+// final
+void zapiszZ33(const char *nazwa, const naglowekObrazu &opcje);
+void wczytajZ33(const char *nazwa);
 
 #endif // SM2025_FUNKCJE_H_INCLUDED
