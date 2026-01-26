@@ -1095,7 +1095,130 @@ void LZWDekompresja(const char *nazwaPliku)
 }
 
 // p8
-// implementacje
+Uint8 predyktorPaeth(Uint8 a, Uint8 b, Uint8 c)
+{
+    int p = (int) a + (int) b - (int) c;
+    int pa = abs(p - (int) a);
+    int pb = abs(p - (int) b);
+    int pc = abs(p - (int) c);
+
+    if (pa<= pb && pa<=pc)
+        return a;
+    else if (pb<=pc)
+        return b;
+    else
+        return c;
+}
+
+void filtrSub(Uint8 *wejscie, Uint8 *wyjscie, int szer, int wys, int bpp)
+{
+    int stride = szer * bpp;
+
+    for (int y =0; y<wys; y++)
+        for (int x=0; x< stride; x++)
+        {
+            int i = y* stride + x;
+            Uint8 lewy = (x >= bpp) ? wejscie[i - bpp] : 0;
+            wyjscie[i] = wejscie[i] - lewy;
+        }
+}
+
+void filtrUp(Uint8 *wejscie, Uint8 *wyjscie, int szer, int wys, int bpp)
+{
+    int stride = szer * bpp;
+
+    for (int y =0; y<wys; y++)
+        for (int x=0; x< stride; x++)
+        {
+            int i = y* stride + x;
+            Uint8 gora = (y > 0) ? wejscie[i - stride] : 0;
+            wyjscie[i] = wejscie[i] - gora;
+        }
+}
+
+void filtrAvg(Uint8 *wejscie, Uint8 *wyjscie, int szer, int wys, int bpp)
+{
+    int stride = szer * bpp;
+
+    for (int y =0; y<wys; y++)
+        for (int x=0; x< stride; x++)
+        {
+            int i = y* stride + x;
+            Uint8 lewy = (x >= bpp) ? wyjscie[i - bpp] : 0;
+            Uint8 gora = (y > 0) ? wejscie[i - stride] : 0;
+            wyjscie[i] = wejscie[i] - ((lewy + gora) /2);
+        }
+}
+
+void filtrPaeth(Uint8 *wejscie, Uint8 *wyjscie, int szer, int wys, int bpp)
+{
+    int stride = szer * bpp;
+
+    for (int y =0; y<wys; y++)
+        for (int x=0; x< stride; x++)
+        {
+            int i = y* stride + x;
+            Uint8 lewy = (x >= bpp) ? wyjscie[i - bpp] : 0;
+            Uint8 gora = (y > 0) ? wejscie[i - stride] : 0;
+            Uint8 goraLewy = (x >= bpp && y > 0) ? wejscie[i - stride - bpp] : 0;
+            wyjscie[i] = wejscie[i] - predyktorPaeth(lewy, gora, goraLewy);
+        }
+}
+
+void defiltrSub(Uint8 *wejscie, Uint8 *wyjscie, int szer, int wys, int bpp)
+{
+    int stride = szer * bpp;
+
+    for (int y =0; y<wys; y++)
+        for (int x=0; x< stride; x++)
+        {
+            int i = y* stride + x;
+            Uint8 lewy = (x >= bpp) ? wyjscie[i - bpp] : 0;
+            wyjscie[i] = wejscie[i] + lewy;
+        }
+}
+
+void defiltrUp(Uint8 *wejscie, Uint8 *wyjscie, int szer, int wys, int bpp)
+{
+    int stride = szer * bpp;
+
+    for (int y =0; y<wys; y++)
+        for (int x=0; x< stride; x++)
+        {
+            int i = y* stride + x;
+            Uint8 gora = (y > 0) ? wyjscie[i - stride] : 0;
+            wyjscie[i] = wejscie[i] + gora;
+        }
+}
+
+void defiltrAvg(Uint8 *wejscie, Uint8 *wyjscie, int szer, int wys, int bpp)
+{
+    int stride = szer * bpp;
+
+    for (int y =0; y<wys; y++)
+        for (int x=0; x< stride; x++)
+        {
+            int i = y* stride + x;
+            Uint8 lewy = (x >= bpp) ? wyjscie[i - bpp] : 0;
+            Uint8 gora = (y > 0) ? wyjscie[i - stride] : 0;
+            wyjscie[i] = wejscie[i] + ((lewy + gora) /2);
+        }
+}
+
+void defiltrPaeth(Uint8 *wejscie, Uint8 *wyjscie, int szer, int wys, int bpp)
+{
+    int stride = szer * bpp;
+
+    for (int y =0; y<wys; y++)
+        for (int x=0; x< stride; x++)
+        {
+            int i = y* stride + x;
+            Uint8 lewy = (x >= bpp) ? wyjscie[i - bpp] : 0;
+            Uint8 gora = (y > 0) ? wyjscie[i - stride] : 0;
+            Uint8 goraLewy = (x >= bpp && y > 0) ? wyjscie[i - stride - bpp] : 0;
+            wyjscie[i] = wejscie[i] + predyktorPaeth(lewy, gora, goraLewy);
+        }
+}
 
 /*
     // testy
