@@ -33,6 +33,9 @@ void czyscEkran(Uint8 R, Uint8 G, Uint8 B);
 
 void ladujBMP(char const *nazwa, int x, int y);
 
+//gk
+//rzeczy z gk
+
 // p1
 void setYUV(int xx, int yy, float y, float u, float v);
 

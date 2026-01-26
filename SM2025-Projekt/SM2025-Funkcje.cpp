@@ -277,6 +277,9 @@ void czyscEkran(Uint8 R, Uint8 G, Uint8 B)
     SDL_UpdateWindowSurface(window);
 }
 
+//gk
+//rzeczy z gk
+
 // p1
 void setYUV(int xx, int yy, float y, float u, float v)
 {
