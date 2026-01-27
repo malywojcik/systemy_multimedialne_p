@@ -15,7 +15,14 @@ add_executable(SM2025_Projekt
         SM2025-Paleta.h
         SM2025-Projekt.cpp
         SM2025-Zmienne.cpp
-        SM2025-Zmienne.h)
+        SM2025-Zmienne.h
+        SM2025-Pliki.cpp
+        SM2025-Pliki.h
+        SM2025-Modele.cpp
+        SM2025-Modele.h
+        SM2025-Kompresje.cpp
+        SM2025-Kompresje.h
+)
 
 target_link_options(SM2025_Projekt PRIVATE -static-libstdc++ -static-libgcc -static)
 

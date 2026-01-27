@@ -56,6 +56,12 @@
 		<Unit filename="SM2025-Paleta.h" />
 		<Unit filename="SM2025-Zmienne.cpp" />
 		<Unit filename="SM2025-Zmienne.h" />
+		<Unit filename="SM2025-Kompresje.cpp" />
+		<Unit filename="SM2025-Kompresje.h" />
+		<Unit filename="SM2025-Modele.cpp" />
+		<Unit filename="SM2025-Modele.h" />
+		<Unit filename="SM2025-Pliki.cpp" />
+		<Unit filename="SM2025-Pliki.h" />
 		<Extensions>
 			<lib_finder disable_auto="1" />
 		</Extensions>

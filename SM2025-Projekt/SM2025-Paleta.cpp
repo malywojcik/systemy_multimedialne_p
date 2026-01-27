@@ -4,34 +4,32 @@
 #include "SM2025-Funkcje.h"
 #include <algorithm>
 
- using namespace std;
+using namespace std;
 
 // gk
 void paletaNarzucona5bitDithering()
 {
-    const int bayer[4][4] = { {0,8,2,10},
-                            {12,4,14,6},
-                            {3,11,1,9},
-                            {15,7,13,5} };
-    SDL_Color k; float thr;
-    int R,G,B,nr,ng,nb;
+    const int bayer[4][4] = {
+        {0, 8, 2, 10},
+        {12, 4, 14, 6},
+        {3, 11, 1, 9},
+        {15, 7, 13, 5}
+    };
+    SDL_Color k;
+    float thr;
+    Uint8 r, g, b;
     for (int y = 0; y < wysokosc / 2; ++y)
         for (int x = 0; x < szerokosc / 2; ++x)
         {
             k = getPixel(x, y);
             thr = (bayer[y & 3][x & 3] - 7.5f) / 16.0f;
-            float rm = clamp(k.r + thr * (255.0f / 32.0f), 0.0f, 255.0f);
-            float gm = clamp(k.g + thr * (255.0f / 64.0f), 0.0f, 255.0f);
-            float bm = clamp(k.b + thr * (255.0f / 32.0f), 0.0f, 255.0f);
-            nr = int(round(rm * 3.0f / 255.0f));
-            ng = int(round(gm * 3.0f / 255.0f));
-            nb = bm >= 128.0f ? 1 : 0;
-            R = nr * 85; G = ng * 85; B = nb * 255;
-            Uint8 r5, g6, b5;
-            r5 = (Uint8(rm) >> 3) << 3;
-            g6 = (Uint8(gm) >> 2) << 2;
-            b5 = (Uint8(bm) >> 3) << 3;
-            setPixel(x, y, r5, g6, b5);
+            float rm = k.r * (31.0f / 255.0f) + thr;
+            float gm = k.g * (63.0f / 255.0f) + thr;
+            float bm = k.b * (31.0f / 255.0f) + thr;
+            r = (Uint8) min(31.0f, max(0.0f, rm));
+            g = (Uint8) min(63.0f, max(0.0f, gm));
+            b = (Uint8) min(31.0f, max(0.0f, bm));
+            setPixel(x, y, r, g, b);
         }
 }
 
