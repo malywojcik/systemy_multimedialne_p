@@ -17,7 +17,8 @@ obj/
 *.exe
 *.dll
 *.bin
-*.z33
+*.dg24
+*.DG24
 
 !SDL2.dll
 !lister.exe

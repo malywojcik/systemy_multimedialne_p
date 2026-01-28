@@ -8,6 +8,7 @@
 #include <fstream>
 #include <iostream>
 #include <vector>
+#include <cstring>
 
 void ladujBMP(char const *nazwa, int x, int y)
 {
@@ -30,22 +31,39 @@ void ladujBMP(char const *nazwa, int x, int y)
     }
 }
 
-void zapisz(const char *nazwa, const naglowekObrazu &opcje)
+Uint8 kodujTryb(bool czy15bit, bool czyYCbCr, bool czyDithering)
+{
+    Uint8 t = 0;
+    if (czy15bit) t |= 1;
+    if (czyYCbCr) t |= 2;
+    if (czyDithering) t |= 4;
+
+    return t;
+}
+
+void dekodujTryb(Uint8 t, bool &czy15bit, bool &czyYCbCr, bool &czyDithering)
+{
+    czy15bit = (t & 1);
+    czyYCbCr = (t & 2);
+    czyDithering = (t & 4);
+}
+
+void zapisz(const char *nazwa, const opcjeProgramu &opcje)
 {
     vector<Uint8> dane;
     for (int y = 0; y < wysokosc; y++)
         for (int x = 0; x < szerokosc; x++)
         {
             SDL_Color k = getPixel(x, y);
-            if (opcje.glebiaBitowa == 16)
+            if (opcje.czy15bit)
             {
-                Uint16 px = ((k.r >> 3) << 11) | ((k.g >> 2) << 5) | (k.b >> 3);
+                Uint16 px = getRGB555_(x, y);
                 dane.push_back(px & 0xFF);
                 dane.push_back((px >> 8) & 0xFF);
             }
             else
             {
-                if (opcje.modelBarwny == 1) // YCbCr
+                if (opcje.czyYCbCR)
                 {
                     YCbCr ycbcr = getYCbCr(x, y);
                     dane.push_back((Uint8) ycbcr.Y);
@@ -62,22 +80,27 @@ void zapisz(const char *nazwa, const naglowekObrazu &opcje)
         }
 
     vector<Uint8> danePredykcja = dane;
-    if (opcje.predykcja > 0)
+    if (opcje.czyPredykcja)
     {
         danePredykcja.assign(dane.size(), 0);
-        int bpp = (opcje.glebiaBitowa == 16) ? 2 : 3;
-        filtrPaeth(dane.data(), danePredykcja.data(), szerokosc, wysokosc, bpp);
+        int bpp = (opcje.czy15bit) ? 2 : 3;
+        filtrAvg(dane.data(), danePredykcja.data(), szerokosc, wysokosc, bpp);
     }
 
     vector<Uint8> daneKompresja;
-    if (opcje.kompresja == 1)
-        daneKompresja = ByteRunKompresja(danePredykcja);
-    else if (opcje.kompresja == 2)
+    if (opcje.czyKompresja)
         daneKompresja = RLEKompresja(danePredykcja);
-    else if (opcje.kompresja == 3)
-        daneKompresja = LZWKompresja(danePredykcja);
     else
         daneKompresja = danePredykcja;
+
+    naglowekObrazu nag;
+    memcpy(nag.identyfikator, "DG24", 4);
+    nag.szer = szerokosc;
+    nag.wyso = wysokosc;
+    nag.tryb = kodujTryb(opcje.czy15bit, opcje.czyYCbCR, opcje.czyDithering);
+    nag.predykcja = opcje.czyPredykcja ? 1 : 0;
+    nag.kompresja = opcje.czyKompresja ? 1 : 0;
+    nag.rozmiarDanych = (Uint32)daneKompresja.size();
 
     ofstream plik(nazwa, ios::binary);
     plik.write((char *) &opcje, sizeof(naglowekObrazu));
@@ -99,32 +122,33 @@ void wczytaj(const char *nazwa)
     naglowekObrazu opcje;
     plik.read((char *) &opcje, sizeof(naglowekObrazu));
 
-    streamoff aktualnaPozycja = plik.tellg();
-    plik.seekg(0, ios::end);
-    streamoff koniecPliku = plik.tellg();
-    plik.seekg(aktualnaPozycja, ios::beg);
+    if (strncmp(opcje.identyfikator, "DG24", 4) != 0) {
+        cout << "To nie jest plik DG24!" << endl;
+        plik.close();
+        return;
+    }
 
-    size_t rozmiarDanych = koniecPliku - aktualnaPozycja;
-    vector<Uint8> daneKompresja(rozmiarDanych);
-    plik.read((char *) daneKompresja.data(), rozmiarDanych);
+    bool czy15bit, czyYCbCr, czyDithering;
+    dekodujTryb(opcje.tryb, czy15bit, czyYCbCr, czyDithering);
+    bool czyPredykcja = (opcje.predykcja == 1);
+    bool czyKompresja = (opcje.kompresja == 1);
 
+
+    vector<Uint8> daneKompresja(opcje.rozmiarDanych);
+    plik.read((char *) daneKompresja.data(), opcje.rozmiarDanych);
     plik.close();
 
     vector<Uint8> daneDekompresja;
-    if (opcje.kompresja == 0)
-        daneDekompresja = daneKompresja;
-    else if (opcje.kompresja == 1)
-        daneDekompresja = ByteRunDekompresja(daneKompresja);
-    else if (opcje.kompresja == 2)
+    if (czyKompresja)
         daneDekompresja = RLEDekompresja(daneKompresja);
-    else if (opcje.kompresja == 3)
-        daneDekompresja = LZWDekompresja(daneKompresja);
+    else
+        daneDekompresja = daneKompresja;
 
     vector<Uint8> dane(daneDekompresja.size());
-    if (opcje.predykcja > 0)
+    if (czyPredykcja)
     {
-        int bpp = (opcje.glebiaBitowa == 16) ? 2 : 3;
-        defiltrPaeth(daneDekompresja.data(), dane.data(), szerokosc, wysokosc, bpp);
+        int bpp = (czy15bit) ? 2 : 3;
+        defiltrAvg(daneDekompresja.data(), dane.data(), opcje.szer, opcje.wyso, bpp);
     }
     else
         dane = daneDekompresja;
@@ -133,19 +157,24 @@ void wczytaj(const char *nazwa)
     for (int y = 0; y < wysokosc; y++)
         for (int x = 0; x < szerokosc; x++)
         {
-            if (opcje.glebiaBitowa == 16)
+            if (czy15bit)
             {
+                if (index + 1 >= dane.size())
+                    break;
                 Uint8 low = dane[index++];
                 Uint8 high = dane[index++];
                 Uint16 px = (high << 8) | low;
-                setRGB565(x, y, px);
+
+                setRGB555(x, y, px);
             }
             else
             {
+                if (index + 2 >= dane.size())
+                    break;
                 Uint8 r = dane[index++];
                 Uint8 g = dane[index++];
                 Uint8 b = dane[index++];
-                if (opcje.modelBarwny == 1) // YCbCr
+                if (czyYCbCr)
                     setYCbCr(x, y, r, g, b);
                 else
                     setPixel(x, y, r, g, b);

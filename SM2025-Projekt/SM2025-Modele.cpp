@@ -28,26 +28,26 @@ YCbCr getYCbCr(int xx, int yy)
     return ycbcr;
 }
 
-void setRGB565(int xx, int yy, Uint16 rgb565)
+void setRGB555(int xx, int yy, Uint16 rgb555)
 {
-    Uint8 r5 = (rgb565 >> 11) & 0x1F;
-    Uint8 g6 = (rgb565 >> 5) & 0x3F;
-    Uint8 b5 = (rgb565) & 0x1F;
+    Uint8 r5 = (rgb555 >> 10) & 0x1F;
+    Uint8 g5 = (rgb555 >> 5) & 0x1F;
+    Uint8 b5 = (rgb555) & 0x1F;
 
-    Uint8 R = (r5 * 255) / 31;
-    Uint8 G = (g6 * 255) / 63;
-    Uint8 B = (b5 * 255) / 31;
+    Uint8 r = (r5 << 3) | (r5 >> 2);
+    Uint8 g = (g5 << 3) | (g5 >> 2);
+    Uint8 b = (b5 << 3) | (b5 >> 2);
 
-    setPixel(xx, yy, R, G, B);
+    setPixel(xx, yy, r, g, b);
 }
 
-Uint16 getRGB565_(int xx, int yy)
+Uint16 getRGB555_(int xx, int yy)
 {
     SDL_Color k = getPixel(xx, yy);
 
-    Uint16 r5 = (k.r * 31) / 255;
-    Uint16 g6 = (k.g * 63) / 255;
-    Uint16 b5 = (k.b * 31) / 255;
+    Uint16 r5 = (k.r >> 3) & 0x1F;
+    Uint16 g5 = (k.g >> 3) & 0x1F;
+    Uint16 b5 = (k.b >> 3) & 0x1F;
 
-    return (r5 << 11) | (g6 << 5) | b5;
+    return (r5 << 10) | (g5 << 5) | b5;
 }

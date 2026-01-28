@@ -36,6 +36,7 @@ int main(int argc, char *argv[])
 
     string plikIn, plikOut;
     char wybor;
+    opcjeProgramu opcje = {false, false, false, false};
 
     cout << "--- SM2025 PROJEKT ZESPOL33 ---" << endl;
 
@@ -46,7 +47,7 @@ int main(int argc, char *argv[])
 
     SDL_PumpEvents();
 
-    if (czyRozszerzenie(plikIn, ".z33") || czyRozszerzenie(plikIn, ".Z33"))
+    if (czyRozszerzenie(plikIn, ".dg24") || czyRozszerzenie(plikIn, ".DG24"))
     {
         cout << "Tryb: Dekodowanie pliku autorskiego." << endl;
         wczytaj(plikIn.c_str());
@@ -63,67 +64,47 @@ int main(int argc, char *argv[])
         cout << "Tryb: Kodowanie do formatu autorskiego." << endl;
         ladujBMP(plikIn.c_str(), 0, 0);
 
-        naglowekObrazu opcje;
-
-        opcje.identyfikator = 0x335A;
-        opcje.szer = szerokosc;
-        opcje.wyso = wysokosc;
-        opcje.glebiaBitowa = 24;
-        opcje.modelBarwny = 0; // RGB
-        opcje.kompresja = 0; // Brak
-        opcje.predykcja = 0; // Brak
-        opcje.dithering = 0; // Brak
-        opcje.zarezerwowane = 0;
-
-        cout << "W jakim trybie barwnym zapisac obraz? (1 - 16-bit, 2 - 24-bit): ";
+        cout << "W jakim trybie barwnym zapisac obraz? (1 - 15-bit, 2 - 24-bit): ";
         cin >> wybor;
 
         if (wybor == '1')
         {
-            opcje.glebiaBitowa = 16;
+            opcje.czy15bit = true;
 
             cout << "Czy dithering? (t/n): ";
             cin >> wybor;
             if (wybor == 't' || wybor == 'T')
             {
-                opcje.dithering = 1;
+                opcje.czyDithering = true;
                 paletaNarzucona5bitDithering();
+                SDL_UpdateWindowSurface(window);
             }
-
-            cout << "Czy predykcja? (t/n): ";
-            cin >> wybor;
-            if (wybor == 't' || wybor == 'T')
-                opcje.predykcja = 4;
-
-            cout << "Czy kompresja bezstratna? (t/n): ";
-            cin >> wybor;
-            if (wybor == 't' || wybor == 'T')
-                opcje.kompresja = 3;
         }
         else
         {
-            opcje.glebiaBitowa = 24;
+            opcje.czy15bit = false;
 
             cout << "Czy RGB? (t - tak, n - nie [YCbCr]): ";
             cin >> wybor;
             if (wybor == 'n' || wybor == 'N')
-                opcje.modelBarwny = 1;
-
-            cout << "Czy predykcja? (t/n): ";
-            cin >> wybor;
-            if (wybor == 't' || wybor == 'T')
-                opcje.predykcja = 4;
-
-            cout << "Czy kompresja bezstratna? (t/n): ";
-            cin >> wybor;
-            if (wybor == 't' || wybor == 'T')
-                opcje.kompresja = 3;
+                opcje.czyYCbCR = true;
         }
+
+        cout << "Czy predykcja? (t/n): ";
+        cin >> wybor;
+        if (wybor == 't' || wybor == 'T')
+            opcje.czyPredykcja = true;
+
+        cout << "Czy kompresja bezstratna? (t/n): ";
+        cin >> wybor;
+        if (wybor == 't' || wybor == 'T')
+            opcje.czyKompresja = true;
 
         zapisz(plikOut.c_str(), opcje);
 
         czyscEkran(0, 0, 0);
         wczytaj(plikOut.c_str());
+        SDL_Delay(500);
         cout << "Gotowe. Sprawdz plik wyjsciowy." << endl;
     }
 
