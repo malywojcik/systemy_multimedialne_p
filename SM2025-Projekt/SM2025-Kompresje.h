@@ -24,7 +24,7 @@ vector<Uint8> LZWDekompresja(const vector<Uint8> &wejscie);
 // LZW
 void LZWinicjalizacja();
 
-int dodajDoSlownika(slowo nowy, bool czyWyslietlac = false);
+int dodajDoSlownika(slowo nowy);
 
 slowo noweSlowo();
 

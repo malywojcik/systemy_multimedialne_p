@@ -4,8 +4,8 @@
 
 #include <SDL2/SDL.h>
 
-#define szerokosc 640
-#define wysokosc 400
+#define szerokosc 320
+#define wysokosc 200
 
 #define tytul "SM2025 - Projekt - Zespol 33"
 
@@ -28,7 +28,7 @@ struct slowo
 };
 
 extern int rozmiarSlownika;
-extern slowo slownik[65535];
+extern slowo slownik[65536];
 
 struct naglowekObrazu
 {

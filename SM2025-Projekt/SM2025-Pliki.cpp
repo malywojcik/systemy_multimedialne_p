@@ -13,19 +13,18 @@ void ladujBMP(char const *nazwa, int x, int y)
 {
     SDL_Surface *bmp = SDL_LoadBMP(nazwa);
     if (!bmp)
-    {
         printf("Unable to load bitmap: %s\n", SDL_GetError());
-    } else
+
+    else
     {
         SDL_Color kolor;
         for (int yy = 0; yy < bmp->h; yy++)
-        {
             for (int xx = 0; xx < bmp->w; xx++)
             {
                 kolor = getPixelSurface(xx, yy, bmp);
                 setPixel(xx, yy, kolor.r, kolor.g, kolor.b);
             }
-        }
+
         SDL_FreeSurface(bmp);
         SDL_UpdateWindowSurface(window);
     }
@@ -43,7 +42,8 @@ void zapisz(const char *nazwa, const naglowekObrazu &opcje)
                 Uint16 px = ((k.r >> 3) << 11) | ((k.g >> 2) << 5) | (k.b >> 3);
                 dane.push_back(px & 0xFF);
                 dane.push_back((px >> 8) & 0xFF);
-            } else
+            }
+            else
             {
                 if (opcje.modelBarwny == 1) // YCbCr
                 {
@@ -51,7 +51,8 @@ void zapisz(const char *nazwa, const naglowekObrazu &opcje)
                     dane.push_back((Uint8) ycbcr.Y);
                     dane.push_back((Uint8) ycbcr.Cb);
                     dane.push_back((Uint8) ycbcr.Cr);
-                } else
+                }
+                else
                 {
                     dane.push_back(k.r);
                     dane.push_back(k.g);
@@ -98,7 +99,15 @@ void wczytaj(const char *nazwa)
     naglowekObrazu opcje;
     plik.read((char *) &opcje, sizeof(naglowekObrazu));
 
-    vector<Uint8> daneKompresja((istreambuf_iterator<char>(plik)), istreambuf_iterator<char>());
+    streamoff aktualnaPozycja = plik.tellg();
+    plik.seekg(0, ios::end);
+    streamoff koniecPliku = plik.tellg();
+    plik.seekg(aktualnaPozycja, ios::beg);
+
+    size_t rozmiarDanych = koniecPliku - aktualnaPozycja;
+    vector<Uint8> daneKompresja(rozmiarDanych);
+    plik.read((char *) daneKompresja.data(), rozmiarDanych);
+
     plik.close();
 
     vector<Uint8> daneDekompresja;
@@ -116,7 +125,8 @@ void wczytaj(const char *nazwa)
     {
         int bpp = (opcje.glebiaBitowa == 16) ? 2 : 3;
         defiltrPaeth(daneDekompresja.data(), dane.data(), szerokosc, wysokosc, bpp);
-    } else
+    }
+    else
         dane = daneDekompresja;
 
     int index = 0;
@@ -129,7 +139,8 @@ void wczytaj(const char *nazwa)
                 Uint8 high = dane[index++];
                 Uint16 px = (high << 8) | low;
                 setRGB565(x, y, px);
-            } else
+            }
+            else
             {
                 Uint8 r = dane[index++];
                 Uint8 g = dane[index++];
@@ -140,5 +151,6 @@ void wczytaj(const char *nazwa)
                     setPixel(x, y, r, g, b);
             }
         }
+
     SDL_UpdateWindowSurface(window);
 }

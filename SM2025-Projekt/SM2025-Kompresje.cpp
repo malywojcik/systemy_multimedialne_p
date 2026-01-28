@@ -1,8 +1,12 @@
 #include "SM2025-Kompresje.h"
 #include <iostream>
 #include <cmath>
+#include <map>
+#include <string>
 
 using namespace std;
+
+static map<string, int> slownikMap;
 
 vector<Uint8> ByteRunKompresja(const vector<Uint8> &wejscie)
 {
@@ -20,7 +24,8 @@ vector<Uint8> ByteRunKompresja(const vector<Uint8> &wejscie)
             wyjscie.push_back((Uint8) (-j));
             wyjscie.push_back(wejscie[i]);
             i += (j + 1);
-        } else
+        }
+        else
         {
             int j = 0;
             while ((i + j < dlugosc - 1) && (wejscie[i + j] != wejscie[i + j + 1]) && (j < 127))
@@ -48,7 +53,8 @@ vector<Uint8> RLEKompresja(const vector<Uint8> &wejscie)
             wyjscie.push_back((Uint8) (j + 1));
             wyjscie.push_back(wejscie[i]);
             i += (j + 1);
-        } else
+        }
+        else
         {
             int j = 0;
             while ((i + j < dlugosc - 1) && (wejscie[i + j] != wejscie[i + j + 1]) && (j < 254))
@@ -94,13 +100,14 @@ vector<Uint8> LZWKompresja(const vector<Uint8> &wejscie)
             aktualneSlowo = slowoZnak;
             aktualneSlowo.kod = kod;
             aktualneSlowo.wSlowniku = true;
-        } else
+        }
+        else
         {
             Uint16 wartosc = aktualneSlowo.kod;
             wyjscie.push_back(wartosc & 0xFF);
             wyjscie.push_back((wartosc >> 8) & 0xFF);
 
-            dodajDoSlownika(slowoZnak, false);
+            dodajDoSlownika(slowoZnak);
             aktualneSlowo = noweSlowo(znak);
             aktualneSlowo.kod = znajdzWSlowniku(aktualneSlowo);
             aktualneSlowo.wSlowniku = true;
@@ -132,17 +139,16 @@ vector<Uint8> ByteRunDekompresja(const vector<Uint8> &wejscie)
                 for (int k = 0; k < count; k++)
                     wyjscie.push_back(val);
             }
-        } else if (n >= 0 && n <= 127)
+        }
+        else if (n >= 0 && n <= 127)
         {
             int count = n + 1;
             for (int k = 0; k < count; k++)
-            {
                 if (i < wejscie.size())
                 {
                     wyjscie.push_back(wejscie[i]);
                     i++;
                 }
-            }
         }
     }
     return wyjscie;
@@ -156,15 +162,14 @@ vector<Uint8> RLEDekompresja(const vector<Uint8> &wejscie)
     {
         Uint8 n = wejscie[i++];
         if (n > 0)
-        {
             if (i < wejscie.size())
             {
                 Uint8 val = wejscie[i++];
                 for (int k = 0; k < n; k++)
                     wyjscie.push_back(val);
             }
-        } else
-        {
+
+        else
             if (i < wejscie.size())
             {
                 Uint8 count = wejscie[i++];
@@ -172,9 +177,9 @@ vector<Uint8> RLEDekompresja(const vector<Uint8> &wejscie)
                     if (i < wejscie.size())
                         wyjscie.push_back(wejscie[i++]);
 
-                if (count % 2 != 0) i++;
+                if (count % 2 != 0)
+                    i++;
             }
-        }
     }
     return wyjscie;
 }
@@ -185,7 +190,8 @@ vector<Uint8> LZWDekompresja(const vector<Uint8> &wejscie)
     LZWinicjalizacja();
 
     int i = 0;
-    if (i + 1 >= wejscie.size()) return wyjscie;
+    if (i + 1 >= wejscie.size())
+        return wyjscie;
 
     Uint16 kod = wejscie[i] | (wejscie[i + 1] << 8);
     i += 2;
@@ -211,10 +217,12 @@ vector<Uint8> LZWDekompresja(const vector<Uint8> &wejscie)
             {
                 tmp.element[tmp.dlugosc] = tmp.element[0];
                 tmp.dlugosc++;
-                for (int k = 0; k < tmp.dlugosc; k++) wyjscie.push_back(tmp.element[k]);
-                dodajDoSlownika(tmp, false);
+                for (int k = 0; k < tmp.dlugosc; k++)
+                    wyjscie.push_back(tmp.element[k]);
+                dodajDoSlownika(tmp);
             }
-        } else
+        }
+        else
         {
             slowoWejsciowe = &slownik[kodDoPrzetworzenia];
             for (int k = 0; k < slowoWejsciowe->dlugosc; k++)
@@ -225,7 +233,7 @@ vector<Uint8> LZWDekompresja(const vector<Uint8> &wejscie)
             {
                 tmp.element[tmp.dlugosc] = slowoWejsciowe->element[0];
                 tmp.dlugosc++;
-                dodajDoSlownika(tmp, false);
+                dodajDoSlownika(tmp);
             }
         }
         staryKod = nowyKod;
@@ -235,6 +243,7 @@ vector<Uint8> LZWDekompresja(const vector<Uint8> &wejscie)
 
 void LZWinicjalizacja()
 {
+    slownikMap.clear();
     rozmiarSlownika = 0;
     for (int s = 0; s < 65536; s++)
     {
@@ -244,7 +253,7 @@ void LZWinicjalizacja()
         memset(slownik[s].element, 0, sizeof(slownik[s].element));
     }
     slowo noweSlowo;
-    for (int s = 0; s < 4; s++)
+    for (int s = 0; s < 256; s++)
     {
         noweSlowo.dlugosc = 1;
         noweSlowo.element[0] = s;
@@ -252,7 +261,7 @@ void LZWinicjalizacja()
     }
 }
 
-int dodajDoSlownika(slowo nowy, bool czyWyslietlac)
+int dodajDoSlownika(slowo nowy)
 {
     if (rozmiarSlownika < 65536)
     {
@@ -261,6 +270,9 @@ int dodajDoSlownika(slowo nowy, bool czyWyslietlac)
         slownik[nr].dlugosc = nowy.dlugosc;
         copy(begin(nowy.element), end(nowy.element), begin(slownik[nr].element));
         slownik[nr].wSlowniku = true;
+        string klucz((char *) slownik[nr].element, slownik[nr].dlugosc);
+        slownikMap[klucz] = nr;
+
         rozmiarSlownika++;
         return nr;
     }
@@ -298,19 +310,20 @@ slowo polaczSlowo(slowo aktualneSlowo, Uint8 znak)
         for (int i = 0; i < aktualneSlowo.dlugosc; i++)
             polaczoneSlowo.element[i] = aktualneSlowo.element[i];
         polaczoneSlowo.element[aktualneSlowo.dlugosc] = znak;
+
         return polaczoneSlowo;
-    } else
-    {
-        cout << "przepelnienie\n";
-        return noweSlowo(znak);
     }
+    else
+        return noweSlowo(znak);
 }
 
 int znajdzWSlowniku(slowo szukany)
 {
-    for (int nr = 0; nr < rozmiarSlownika; nr++)
-        if (porownajSlowa(slownik[nr], szukany))
-            return nr;
+    string klucz((char *) szukany.element, szukany.dlugosc);
+    auto it = slownikMap.find(klucz);
+    if (it != slownikMap.end())
+        return it->second;
+
     return -1;
 }
 
@@ -321,6 +334,7 @@ bool porownajSlowa(slowo slowo1, slowo slowo2)
     for (int s = 0; s < slowo1.dlugosc; s++)
         if (slowo1.element[s] != slowo2.element[s])
             return false;
+
     return true;
 }
 
@@ -347,7 +361,7 @@ void filtrPaeth(Uint8 *wejscie, Uint8 *wyjscie, int szer, int wys, int bpp)
         for (int x = 0; x < stride; x++)
         {
             int i = y * stride + x;
-            Uint8 lewy = (x >= bpp) ? wyjscie[i - bpp] : 0;
+            Uint8 lewy = (x >= bpp) ? wejscie[i - bpp] : 0;
             Uint8 gora = (y > 0) ? wejscie[i - stride] : 0;
             Uint8 goraLewy = (x >= bpp && y > 0) ? wejscie[i - stride - bpp] : 0;
             wyjscie[i] = wejscie[i] - predyktorPaeth(lewy, gora, goraLewy);

@@ -11,9 +11,8 @@ using namespace std;
 bool czyRozszerzenie(string nazwa, string rozszerzenie)
 {
     if (nazwa.length() >= rozszerzenie.length())
-    {
         return (0 == nazwa.compare(nazwa.length() - rozszerzenie.length(), rozszerzenie.length(), rozszerzenie));
-    }
+
     return false;
 }
 
@@ -22,26 +21,30 @@ int main(int argc, char *argv[])
     if (SDL_Init(SDL_INIT_EVERYTHING) != 0)
     {
         printf("SDL_Init Error: %s\n", SDL_GetError());
+
         return EXIT_FAILURE;
     }
 
-    window = SDL_CreateWindow(tytul, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, szerokosc * 2, wysokosc * 2,
-                              SDL_WINDOW_SHOWN);
-    if (!window) return EXIT_FAILURE;
+    window = SDL_CreateWindow(tytul, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, szerokosc * 2, wysokosc * 2, SDL_WINDOW_SHOWN);
+    if (!window)
+        return EXIT_FAILURE;
 
     screen = SDL_GetWindowSurface(window);
-    if (!screen) return false;
+    if (!screen)
+        return false;
     SDL_UpdateWindowSurface(window);
 
     string plikIn, plikOut;
     char wybor;
 
-    cout << "--- SM2025 PROJEKT (Styl SM2024) ---" << endl;
+    cout << "--- SM2025 PROJEKT ZESPOL33 ---" << endl;
 
     cout << "Podaj nazwe pliku wejsciowego: ";
     cin >> plikIn;
     cout << "Podaj nazwe pliku wyjsciowego: ";
     cin >> plikOut;
+
+    SDL_PumpEvents();
 
     if (czyRozszerzenie(plikIn, ".z33") || czyRozszerzenie(plikIn, ".Z33"))
     {
@@ -49,13 +52,13 @@ int main(int argc, char *argv[])
         wczytaj(plikIn.c_str());
 
         if (SDL_SaveBMP(screen, plikOut.c_str()) == 0)
-        {
             cout << "Zapisano BMP: " << plikOut << endl;
-        } else
-        {
+
+        else
             cout << "Blad zapisu BMP: " << SDL_GetError() << endl;
-        }
-    } else
+
+    }
+    else
     {
         cout << "Tryb: Kodowanie do formatu autorskiego." << endl;
         ladujBMP(plikIn.c_str(), 0, 0);
@@ -84,31 +87,37 @@ int main(int argc, char *argv[])
             if (wybor == 't' || wybor == 'T')
             {
                 opcje.dithering = 1;
-                paletaNarzucona5bitDithering(); // Wykonaj dithering na ekranie
+                paletaNarzucona5bitDithering();
             }
 
             cout << "Czy predykcja? (t/n): ";
             cin >> wybor;
-            if (wybor == 't' || wybor == 'T') opcje.predykcja = 4; // Filtr Paeth
+            if (wybor == 't' || wybor == 'T')
+                opcje.predykcja = 4;
 
             cout << "Czy kompresja bezstratna? (t/n): ";
             cin >> wybor;
-            if (wybor == 't' || wybor == 'T') opcje.kompresja = 3; // LZW
-        } else
+            if (wybor == 't' || wybor == 'T')
+                opcje.kompresja = 3;
+        }
+        else
         {
             opcje.glebiaBitowa = 24;
 
             cout << "Czy RGB? (t - tak, n - nie [YCbCr]): ";
             cin >> wybor;
-            if (wybor == 'n' || wybor == 'N') opcje.modelBarwny = 1; // YCbCr
+            if (wybor == 'n' || wybor == 'N')
+                opcje.modelBarwny = 1;
 
             cout << "Czy predykcja? (t/n): ";
             cin >> wybor;
-            if (wybor == 't' || wybor == 'T') opcje.predykcja = 4;
+            if (wybor == 't' || wybor == 'T')
+                opcje.predykcja = 4;
 
             cout << "Czy kompresja bezstratna? (t/n): ";
             cin >> wybor;
-            if (wybor == 't' || wybor == 'T') opcje.kompresja = 3;
+            if (wybor == 't' || wybor == 'T')
+                opcje.kompresja = 3;
         }
 
         zapisz(plikOut.c_str(), opcje);
@@ -118,16 +127,14 @@ int main(int argc, char *argv[])
         cout << "Gotowe. Sprawdz plik wyjsciowy." << endl;
     }
 
+    SDL_UpdateWindowSurface(window);
+
     bool done = false;
     SDL_Event event;
     while (!done)
-    {
         while (SDL_PollEvent(&event))
-        {
             if (event.type == SDL_QUIT || (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_ESCAPE))
                 done = true;
-        }
-    }
 
     if (screen) SDL_FreeSurface(screen);
     if (window) SDL_DestroyWindow(window);
