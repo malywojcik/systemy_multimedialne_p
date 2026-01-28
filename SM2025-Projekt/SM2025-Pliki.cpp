@@ -103,7 +103,7 @@ void zapisz(const char *nazwa, const opcjeProgramu &opcje)
     nag.rozmiarDanych = (Uint32)daneKompresja.size();
 
     ofstream plik(nazwa, ios::binary);
-    plik.write((char *) &opcje, sizeof(naglowekObrazu));
+    plik.write((char *) &nag, sizeof(naglowekObrazu));
     plik.write((char *) daneKompresja.data(), daneKompresja.size());
     plik.close();
 

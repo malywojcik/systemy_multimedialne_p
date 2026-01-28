@@ -104,7 +104,7 @@ int main(int argc, char *argv[])
 
         czyscEkran(0, 0, 0);
         wczytaj(plikOut.c_str());
-        SDL_Delay(500);
+
         cout << "Gotowe. Sprawdz plik wyjsciowy." << endl;
     }
 

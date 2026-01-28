@@ -17,19 +17,25 @@ vector<Uint8> RLEKompresja(const vector<Uint8> &wejscie)
         }
         else
         {
-            int j = 0;
-            while ((i + j < dlugosc - 1) && (wejscie[i + j] != wejscie[i + j + 1]) && (j < 254))
-                j++;
-            if ((i + j == dlugosc - 1) && (j < 254))
-                j++;
-            int count = j + 1;
-            wyjscie.push_back(0);
-            wyjscie.push_back(count);
-            for (int k = 0; k < count; k++)
-                wyjscie.push_back(wejscie[i + k]);
-            if (count % 2 != 0)
+            int k = i;
+            while (k<dlugosc && (k - i<255))
+            {
+                if (k<dlugosc -1 && wejscie[k] == wejscie[k + 1])
+                    break;
+                k++;
+            }
+            int count = k -i;
+
+            if (count > 0)
+            {
                 wyjscie.push_back(0);
-            i += count;
+                wyjscie.push_back(count);
+                for (int m = 0; m < count; m++)
+                    wyjscie.push_back(wejscie[i + m]);
+                if (count % 2 != 0)
+                    wyjscie.push_back(0);
+                i += count;
+            }
         }
     }
     return wyjscie;
