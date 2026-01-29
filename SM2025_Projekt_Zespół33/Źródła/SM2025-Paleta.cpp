@@ -2,7 +2,7 @@
 #include "SM2025-Paleta.h"
 #include "SM2025-Zmienne.h"
 #include "SM2025-Funkcje.h"
-#include <algorithm>
+#include <cmath>
 
 using namespace std;
 
@@ -17,43 +17,33 @@ void paletaNarzucona5bitDithering()
     };
     SDL_Color k;
     float thr;
-    Uint8 r, g, b, r5, g6, b5;
     for (int y = 0; y < wysokosc; ++y)
         for (int x = 0; x < szerokosc; ++x)
         {
             k = getPixel(x, y);
-            thr = (bayer[y & 3][x & 3] - 7.5f) / 16.0f;
+            thr = (bayer[y & 3][x & 3] / 16.0f) - 0.5f;
 
-            float rm = k.r * (31.0f / 255.0f) + thr;
-            float gm = k.g * (63.0f / 255.0f) + thr;
-            float bm = k.b * (31.0f / 255.0f) + thr;
+            int r_new = k.r + (int) (thr * 8.0f);
+            int g_new = k.g + (int) (thr * 8.0f);
+            int b_new = k.b + (int) (thr * 8.0f);
 
-            r5 = (Uint8) min(31.0f, max(0.0f, rm));
-            g6 = (Uint8) min(63.0f, max(0.0f, gm));
-            b5 = (Uint8) min(31.0f, max(0.0f, bm));
+            if (r_new < 0) r_new = 0;
+            if (r_new > 255) r_new = 255;
+            if (g_new < 0) g_new = 0;
+            if (g_new > 255) g_new = 255;
+            if (b_new < 0) b_new = 0;
+            if (b_new > 255) b_new = 255;
 
-            r = (r5 * 255) / 31;
-            g = (g6 * 255) / 63;
-            b = (b5 * 255) / 31;
+            Uint8 r5 = (r_new >> 3);
+            Uint8 g5 = (g_new >> 3);
+            Uint8 b5 = (b_new >> 3);
+
+            Uint8 r = (r5 << 3) | (r5 >> 2);
+            Uint8 g = (g5 << 3) | (g5 >> 2);
+            Uint8 b = (b5 << 3) | (b5 >> 2);
 
             setPixel(x, y, r, g, b);
         }
 
     SDL_UpdateWindowSurface(window);
-}
-
-Uint8 z24do5bit(SDL_Color k)
-{
-    return ((k.r & 0xC0) >> 3) | ((k.g & 0xC0) >> 5) | ((k.b & 0x80) >> 7);
-}
-
-SDL_Color z5bitdo24(Uint8 idx)
-{
-    SDL_Color c;
-    c.r = ((idx >> 3) & 0x03) * 85;
-    c.g = ((idx >> 1) & 0x03) * 85;
-    c.b = (idx & 0x01) ? 255 : 0;
-    c.a = 255;
-
-    return c;
 }

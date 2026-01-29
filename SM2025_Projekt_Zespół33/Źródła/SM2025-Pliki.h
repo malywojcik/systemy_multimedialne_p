@@ -6,7 +6,11 @@
 
 void ladujBMP(char const *nazwa, int x, int y);
 
-void zapisz(const char *nazwa, const naglowekObrazu &opcje);
+Uint8 kodujTryb(bool czy15bit, bool czyYCbCr, bool czyDithering);
+
+void dekodujTryb(Uint8 t, bool &czy15bit, bool &czyYCbCr, bool &czyDithering);
+
+void zapisz(const char *nazwa, const opcjeProgramu &opcje);
 
 void wczytaj(const char *nazwa);
 

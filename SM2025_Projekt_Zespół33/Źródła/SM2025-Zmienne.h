@@ -19,28 +19,26 @@ struct YCbCr
     float Cr;
 };
 
-struct slowo
-{
-    Uint16 kod = 0;
-    Uint8 dlugosc = 0;
-    Uint8 element[4096];
-    bool wSlowniku = false;
-};
-
-extern int rozmiarSlownika;
-extern slowo slownik[65536];
-
+#pragma pack(push, 1)
 struct naglowekObrazu
 {
-    Uint16 identyfikator;
+    char identyfikator[4];
     Uint16 szer;
     Uint16 wyso;
-    Uint8 glebiaBitowa; // 16 lub 24
-    Uint8 modelBarwny; // 0 = RGB, 1 = YCbCr
-    Uint8 kompresja; // 0 = brak, 1 = ByteRun, 2 = RLE, 3 = LZW
-    Uint8 predykcja; // 0 = brak, 4 = Paeth
-    Uint8 dithering; // 0 = nie, 1 = tak
-    Uint8 zarezerwowane;
+    Uint8 tryb;
+    Uint8 predykcja;
+    Uint8 kompresja;
+    Uint32 rozmiarDanych;
+};
+#pragma pack(pop)
+
+struct opcjeProgramu
+{
+    bool czy15bit;
+    bool czyYCbCR;
+    bool czyDithering;
+    bool czyPredykcja;
+    bool czyKompresja;
 };
 
 #endif // SM2025_ZMIENNE_H_INCLUDED
