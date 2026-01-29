@@ -47,19 +47,3 @@ void paletaNarzucona5bitDithering()
 
     SDL_UpdateWindowSurface(window);
 }
-
-Uint8 z24do5bit(SDL_Color k)
-{
-    return ((k.r & 0xC0) >> 3) | ((k.g & 0xC0) >> 5) | ((k.b & 0x80) >> 7);
-}
-
-SDL_Color z5bitdo24(Uint8 idx)
-{
-    SDL_Color c;
-    c.r = ((idx >> 3) & 0x03) * 85;
-    c.g = ((idx >> 1) & 0x03) * 85;
-    c.b = (idx & 0x01) ? 255 : 0;
-    c.a = 255;
-
-    return c;
-}
