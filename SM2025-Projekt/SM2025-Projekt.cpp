@@ -25,7 +25,8 @@ int main(int argc, char *argv[])
         return EXIT_FAILURE;
     }
 
-    window = SDL_CreateWindow(tytul, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, szerokosc * 2, wysokosc * 2, SDL_WINDOW_SHOWN);
+    window = SDL_CreateWindow(tytul, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, szerokosc * 2, wysokosc * 2,
+                              SDL_WINDOW_SHOWN);
     if (!window)
         return EXIT_FAILURE;
 
@@ -57,7 +58,6 @@ int main(int argc, char *argv[])
 
         else
             cout << "Blad zapisu BMP: " << SDL_GetError() << endl;
-
     }
     else
     {

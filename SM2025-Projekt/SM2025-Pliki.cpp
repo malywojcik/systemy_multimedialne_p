@@ -60,8 +60,7 @@ void zapisz(const char *nazwa, const opcjeProgramu &opcje)
                 Uint16 px = getRGB555_(x, y);
                 dane.push_back(px & 0xFF);
                 dane.push_back((px >> 8) & 0xFF);
-            }
-            else
+            } else
             {
                 if (opcje.czyYCbCR)
                 {
@@ -69,8 +68,7 @@ void zapisz(const char *nazwa, const opcjeProgramu &opcje)
                     dane.push_back((Uint8) ycbcr.Y);
                     dane.push_back((Uint8) ycbcr.Cb);
                     dane.push_back((Uint8) ycbcr.Cr);
-                }
-                else
+                } else
                 {
                     dane.push_back(k.r);
                     dane.push_back(k.g);
@@ -100,7 +98,7 @@ void zapisz(const char *nazwa, const opcjeProgramu &opcje)
     nag.tryb = kodujTryb(opcje.czy15bit, opcje.czyYCbCR, opcje.czyDithering);
     nag.predykcja = opcje.czyPredykcja ? 1 : 0;
     nag.kompresja = opcje.czyKompresja ? 1 : 0;
-    nag.rozmiarDanych = (Uint32)daneKompresja.size();
+    nag.rozmiarDanych = (Uint32) daneKompresja.size();
 
     ofstream plik(nazwa, ios::binary);
     plik.write((char *) &nag, sizeof(naglowekObrazu));
@@ -122,7 +120,8 @@ void wczytaj(const char *nazwa)
     naglowekObrazu opcje;
     plik.read((char *) &opcje, sizeof(naglowekObrazu));
 
-    if (strncmp(opcje.identyfikator, "DG24", 4) != 0) {
+    if (strncmp(opcje.identyfikator, "DG24", 4) != 0)
+    {
         cout << "To nie jest plik DG24!" << endl;
         plik.close();
         return;

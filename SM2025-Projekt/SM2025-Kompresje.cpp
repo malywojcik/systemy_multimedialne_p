@@ -3,39 +3,47 @@
 vector<Uint8> RLEKompresja(const vector<Uint8> &wejscie)
 {
     vector<Uint8> wyjscie;
-    int i = 0, dlugosc = wejscie.size();
+    int dlugosc = wejscie.size();
+    int i = 0;
+
     while (i < dlugosc)
     {
-        if ((i < dlugosc - 1) && (wejscie[i] == wejscie[i + 1]))
+        if (i < dlugosc - 1 && wejscie[i] == wejscie[i + 1])
         {
-            int j = 0;
-            while ((i + j < dlugosc - 1) && (wejscie[i + j] == wejscie[i + j + 1]) && (j < 254))
-                j++;
-            wyjscie.push_back((Uint8) (j + 1));
+            int runLength = 1;
+
+            while (i + runLength < dlugosc && wejscie[i + runLength] == wejscie[i] && runLength < 255)
+                runLength++;
+
+            wyjscie.push_back((Uint8) runLength);
             wyjscie.push_back(wejscie[i]);
-            i += (j + 1);
+
+            i += runLength;
         }
         else
         {
-            int k = i;
-            while (k<dlugosc && (k - i<255))
-            {
-                if (k<dlugosc -1 && wejscie[k] == wejscie[k + 1])
-                    break;
-                k++;
-            }
-            int count = k -i;
+            int litLength = 0;
+            int tempIndex = i;
 
-            if (count > 0)
+            while (tempIndex < dlugosc && litLength < 254)
             {
-                wyjscie.push_back(0);
-                wyjscie.push_back(count);
-                for (int m = 0; m < count; m++)
-                    wyjscie.push_back(wejscie[i + m]);
-                if (count % 2 != 0)
-                    wyjscie.push_back(0);
-                i += count;
+                if (tempIndex < dlugosc - 1 && wejscie[tempIndex] == wejscie[tempIndex + 1])
+                    break;
+
+                litLength++;
+                tempIndex++;
             }
+
+            wyjscie.push_back(0);
+            wyjscie.push_back((Uint8) litLength);
+
+            for (int k = 0; k < litLength; k++)
+                wyjscie.push_back(wejscie[i + k]);
+
+            if (litLength % 2 != 0)
+                wyjscie.push_back(0);
+
+            i += litLength;
         }
     }
     return wyjscie;
@@ -45,28 +53,33 @@ vector<Uint8> RLEDekompresja(const vector<Uint8> &wejscie)
 {
     vector<Uint8> wyjscie;
     int i = 0;
-    while (i < wejscie.size())
+    int rozmiarWejscia = wejscie.size();
+
+    while (i < rozmiarWejscia)
     {
         Uint8 n = wejscie[i++];
-        if (n > 0)
-            if (i < wejscie.size())
-            {
-                Uint8 val = wejscie[i++];
-                for (int k = 0; k < n; k++)
-                    wyjscie.push_back(val);
-            }
 
+        if ((n > 0) && (i < rozmiarWejscia))
+        {
+            Uint8 val = wejscie[i++];
+            for (int k = 0; k < n; k++)
+                wyjscie.push_back(val);
+        }
         else
-            if (i < wejscie.size())
+        {
+            if (i < rozmiarWejscia)
             {
                 Uint8 count = wejscie[i++];
+
                 for (int k = 0; k < count; k++)
-                    if (i < wejscie.size())
+                    if (i < rozmiarWejscia)
                         wyjscie.push_back(wejscie[i++]);
 
-                if (count % 2 != 0)
+
+                if ((count % 2 != 0) && (i < rozmiarWejscia))
                     i++;
             }
+        }
     }
     return wyjscie;
 }
@@ -75,13 +88,13 @@ void filtrAvg(Uint8 *wejscie, Uint8 *wyjscie, int szer, int wys, int bpp)
 {
     int stride = szer * bpp;
 
-    for (int y =0; y<wys; y++)
-        for (int x=0; x< stride; x++)
+    for (int y = 0; y < wys; y++)
+        for (int x = 0; x < stride; x++)
         {
-            int i = y* stride + x;
+            int i = y * stride + x;
             Uint8 lewy = (x >= bpp) ? wejscie[i - bpp] : 0;
             Uint8 gora = (y > 0) ? wejscie[i - stride] : 0;
-            wyjscie[i] = wejscie[i] - (((int)lewy + (int)gora) / 2);
+            wyjscie[i] = wejscie[i] - (((int) lewy + (int) gora) / 2);
         }
 }
 
@@ -89,12 +102,12 @@ void defiltrAvg(Uint8 *wejscie, Uint8 *wyjscie, int szer, int wys, int bpp)
 {
     int stride = szer * bpp;
 
-    for (int y =0; y<wys; y++)
-        for (int x=0; x< stride; x++)
+    for (int y = 0; y < wys; y++)
+        for (int x = 0; x < stride; x++)
         {
-            int i = y* stride + x;
+            int i = y * stride + x;
             Uint8 lewy = (x >= bpp) ? wyjscie[i - bpp] : 0;
             Uint8 gora = (y > 0) ? wyjscie[i - stride] : 0;
-            wyjscie[i] = wejscie[i] + (((int)lewy + (int)gora) / 2);
+            wyjscie[i] = wejscie[i] + (((int) lewy + (int) gora) / 2);
         }
 }
